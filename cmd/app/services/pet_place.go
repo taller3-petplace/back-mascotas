@@ -8,6 +8,11 @@ import (
 	"time"
 )
 
+type PetService interface {
+	RegisterNewPet(pet data.Pet) (data.Pet, error)
+	GetPet(pet int) (data.Pet, error)
+}
+
 type PetPlace struct {
 	db db.Storabe
 }
@@ -25,4 +30,8 @@ func (pp *PetPlace) RegisterNewPet(pet data.Pet) (data.Pet, error) {
 
 	return pet, err
 
+}
+
+func (pp *PetPlace) GetPet(pet string) (data.Pet, error) {
+	return data.Pet{}, nil
 }

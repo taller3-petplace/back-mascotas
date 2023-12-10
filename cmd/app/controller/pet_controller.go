@@ -7,14 +7,15 @@ import (
 	"petplace/back-mascotas/cmd/app/controller/pet_errors"
 	"petplace/back-mascotas/cmd/app/data"
 	"petplace/back-mascotas/cmd/app/services"
+	"strconv"
 	"time"
 )
 
 type PetController struct {
-	petPlace services.PetPlace
+	petPlace services.PetService
 }
 
-func NewPetController(service services.PetPlace) PetController {
+func NewPetController(service services.PetService) PetController {
 	return PetController{petPlace: service}
 }
 
@@ -54,7 +55,31 @@ func (pc *PetController) NewPet(c *gin.Context) {
 }
 
 func (pc *PetController) GetPet(c *gin.Context) {
-	c.JSON(http.StatusNoContent, gin.H{"message": "to be implemented"})
+
+	petIDStr, ok := c.Params.Get("pet_id")
+	if !ok || petIDStr == "" {
+		ReturnError(c, http.StatusBadRequest, pet_errors.MissingParams, "expected pet_id")
+		return
+	}
+
+	petID, err := strconv.Atoi(petIDStr)
+	if err != nil {
+		ReturnError(c, http.StatusBadRequest, pet_errors.MissingParams, "cannot parse pet_id: "+err.Error())
+		return
+	}
+
+	newPet, err := pc.petPlace.GetPet(petID)
+	if err != nil {
+		ReturnError(c, http.StatusInternalServerError, pet_errors.ServiceError, err.Error())
+		return
+	}
+
+	if newPet.IsZeroValue() {
+		ReturnError(c, http.StatusNotFound, pet_errors.PetNotFound, fmt.Sprintf("pet with id '%d' not found", petID))
+		return
+	}
+
+	c.JSON(http.StatusOK, newPet)
 }
 
 func (pc *PetController) GetPetsByOwner(c *gin.Context) {
