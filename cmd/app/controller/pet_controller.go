@@ -20,28 +20,37 @@ func NewPetController(service services.PetPlace) PetController {
 
 func (pc *PetController) NewPet(c *gin.Context) {
 
-	var pet data.Pet
-	err := c.BindJSON(&pet)
+	var request data.NewPetRequest
+	err := c.BindJSON(&request)
 	if err != nil {
 		ReturnError(c, http.StatusBadRequest, pet_errors.EntityFormatError, err.Error())
 		return
 	}
 
-	if !validAnimalType(pet.Type) {
-		ReturnError(c, http.StatusBadRequest, pet_errors.InvalidAnimalType, fmt.Sprintf("unexpected animal '%s'", pet.Type))
+	if !validAnimalType(request.Type) {
+		ReturnError(c, http.StatusBadRequest, pet_errors.InvalidAnimalType, fmt.Sprintf("unexpected animal '%s'", request.Type))
 		return
 	}
 
-	pet.RegisterDate = time.Now()
-	pet.Type = pet.Type.Normalice()
+	birthDate, err := time.Parse(time.DateOnly, request.BirthDate)
+	if err != nil {
+		ReturnError(c, http.StatusBadRequest, pet_errors.InvalidBirthDate, fmt.Sprintf("error parsing birth_date"))
+		return
+	}
 
-	err = pc.petPlace.RegisterNewPet(pet)
+	var newPet data.Pet
+	newPet.Type = request.Type.Normalice()
+	newPet.Name = request.Name
+	newPet.OwnerID = request.OwnerID
+	newPet.BirthDate = birthDate
+
+	newPet, err = pc.petPlace.RegisterNewPet(newPet)
 	if err != nil {
 		ReturnError(c, http.StatusInternalServerError, pet_errors.RegisterError, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusCreated, pet)
+	c.JSON(http.StatusCreated, newPet)
 }
 
 func (pc *PetController) GetPet(c *gin.Context) {

@@ -46,7 +46,7 @@ func assertPet(t *testing.T, status int, expectedPet data.Pet, w *httptest.Respo
 	assert.Equal(t, expectedPet.Name, fetchedPet.Name)
 	assert.Equal(t, expectedPet.Type.Normalice(), fetchedPet.Type)
 	assert.Equal(t, expectedPet.BirthDate, fetchedPet.BirthDate)
-	assert.Equal(t, expectedPet.Owner, fetchedPet.Owner)
+	assert.Equal(t, expectedPet.OwnerID, fetchedPet.OwnerID)
 
 	// In order to assert the creation date with no external clock, we'll verify the next:
 	assert.Less(t, expectedPet.RegisterDate, fetchedPet.RegisterDate)
@@ -93,6 +93,21 @@ func TestNewPetController_BadRequest(t *testing.T) {
 	assertError(t, http.StatusBadRequest, response, w)
 }
 
+func TestNewPetController_EmptyRequest(t *testing.T) {
+	mockRouter := routes.NewMockRouter()
+	err := mockRouter.AddPetRoutes()
+	require.NoError(t, err)
+
+	body := `{}`
+	response := pet_errors.EntityFormatError
+
+	w, req := newRequest(http.MethodPost, body, "/pets/", nil)
+	mockRouter.ServeRequest(w, req)
+
+	//Assertion
+	assertError(t, http.StatusBadRequest, response, w)
+}
+
 func TestNewPetController_InvalidAnimalType(t *testing.T) {
 	mockRouter := routes.NewMockRouter()
 	err := mockRouter.AddPetRoutes()
@@ -108,13 +123,29 @@ func TestNewPetController_InvalidAnimalType(t *testing.T) {
 	assertError(t, http.StatusBadRequest, response, w)
 }
 
+func TestNewPetController_InvalidBirthDate(t *testing.T) {
+	mockRouter := routes.NewMockRouter()
+	err := mockRouter.AddPetRoutes()
+	require.NoError(t, err)
+
+	badDate := "2000-13-01"
+	body := fmt.Sprintf(`{"name": "Raaida", "type": "dog", "birth_date": "%s", "owner_id": "owner"}`, badDate)
+	response := pet_errors.InvalidBirthDate
+
+	w, req := newRequest(http.MethodPost, body, "/pets/", nil)
+	mockRouter.ServeRequest(w, req)
+
+	//Assertion
+	assertError(t, http.StatusBadRequest, response, w)
+}
+
 func TestNewPetController_HappyPath(t *testing.T) {
 	mockRouter := routes.NewMockRouter()
 	err := mockRouter.AddPetRoutes()
 	require.NoError(t, err)
 
-	strDate := "2006-01-02T15:04:05-04:00"
-	birthDate, err := time.Parse(time.RFC3339, strDate)
+	strDate := "2006-01-02"
+	birthDate, err := time.Parse(time.DateOnly, strDate)
 	require.NoError(t, err)
 
 	expectedPet := data.Pet{
@@ -122,14 +153,14 @@ func TestNewPetController_HappyPath(t *testing.T) {
 		Type:         "cat",
 		RegisterDate: time.Now(),
 		BirthDate:    birthDate,
-		Owner:        "tfanciotti",
+		OwnerID:      "tfanciotti",
 	}
 
-	rawMsg := fmt.Sprintf(`{"name": "%s", "type": "%s", "birth_date": "%s", "owner": "%s"}`,
+	rawMsg := fmt.Sprintf(`{"name": "%s", "type": "%s", "birth_date": "%s", "owner_id": "%s"}`,
 		expectedPet.Name,
 		expectedPet.Type,
 		strDate,
-		expectedPet.Owner)
+		expectedPet.OwnerID)
 
 	w, req := newRequest(http.MethodPost, rawMsg, "/pets/", nil)
 	mockRouter.ServeRequest(w, req)
