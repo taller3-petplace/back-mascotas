@@ -11,6 +11,7 @@ import (
 type PetService interface {
 	RegisterNewPet(pet data.Pet) (data.Pet, error)
 	GetPet(pet int) (data.Pet, error)
+	GetPetsByOwner(request data.SearchRequest) (data.SearchResponse, error)
 }
 
 type PetPlace struct {
@@ -34,4 +35,8 @@ func (pp *PetPlace) RegisterNewPet(pet data.Pet) (data.Pet, error) {
 
 func (pp *PetPlace) GetPet(pet string) (data.Pet, error) {
 	return data.Pet{}, nil
+}
+
+func (pp *PetPlace) GetPetsByOwner(id int) ([]data.Pet, error) {
+	return nil, nil
 }

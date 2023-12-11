@@ -83,7 +83,48 @@ func (pc *PetController) GetPet(c *gin.Context) {
 }
 
 func (pc *PetController) GetPetsByOwner(c *gin.Context) {
-	c.JSON(http.StatusNoContent, gin.H{"message": "to be implemented"})
+
+	ownerID, ok := c.Params.Get("owner_id")
+	if !ok || ownerID == "" {
+		ReturnError(c, http.StatusBadRequest, pet_errors.MissingParams, "expected owner_id")
+		return
+	}
+
+	searchRequest := data.NewSearchRequest()
+	offsetStr := c.Query("offset")
+	if offsetStr != "" {
+		offset, err := strconv.Atoi(offsetStr)
+		if err != nil {
+			ReturnError(c, http.StatusBadRequest, pet_errors.MissingParams, "cannot parse offset: "+err.Error())
+			return
+		}
+		searchRequest.Offset = uint(offset)
+	}
+
+	limitStr := c.Query("limit")
+	if limitStr != "" {
+		limit, err := strconv.Atoi(limitStr)
+		if err != nil {
+			ReturnError(c, http.StatusBadRequest, pet_errors.MissingParams, "cannot parse limit: "+err.Error())
+			return
+		}
+		searchRequest.Limit = uint(limit)
+	}
+
+	searchRequest.OwnerId = ownerID
+	response, err := pc.petPlace.GetPetsByOwner(searchRequest)
+	if err != nil {
+		ReturnError(c, http.StatusInternalServerError, pet_errors.ServiceError, err.Error())
+		return
+	}
+
+	if len(response.Results) == 0 {
+		ReturnError(c, http.StatusNotFound, pet_errors.PetNotFound, fmt.Sprintf("not found pets for owner: '%s' ", ownerID))
+		return
+	}
+
+	c.JSON(http.StatusOK, response)
+
 }
 
 func (pc *PetController) SearchPet(c *gin.Context) {

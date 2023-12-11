@@ -53,6 +53,21 @@ func (mr *MockPetServiceMockRecorder) GetPet(pet any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPet", reflect.TypeOf((*MockPetService)(nil).GetPet), pet)
 }
 
+// GetPetsByOwner mocks base method.
+func (m *MockPetService) GetPetsByOwner(request data.SearchRequest) (data.SearchResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPetsByOwner", request)
+	ret0, _ := ret[0].(data.SearchResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPetsByOwner indicates an expected call of GetPetsByOwner.
+func (mr *MockPetServiceMockRecorder) GetPetsByOwner(request any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPetsByOwner", reflect.TypeOf((*MockPetService)(nil).GetPetsByOwner), request)
+}
+
 // RegisterNewPet mocks base method.
 func (m *MockPetService) RegisterNewPet(pet data.Pet) (data.Pet, error) {
 	m.ctrl.T.Helper()

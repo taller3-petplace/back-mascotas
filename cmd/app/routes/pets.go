@@ -12,7 +12,7 @@ func (r *Routes) AddPetRoutes(service services.PetService) error {
 
 	group.POST("/", c.NewPet)
 	group.GET("/:pet_id", c.GetPet)
-	group.GET("/", c.GetPetsByOwner)      // TODO
+	group.GET("/owner/:owner_id", c.GetPetsByOwner)
 	group.GET("/owner", c.SearchPet)      // TODO
 	group.PUT("/", c.EditPet)             // TODO
 	group.DELETE("/:pet_id", c.DeletePet) // TODO
