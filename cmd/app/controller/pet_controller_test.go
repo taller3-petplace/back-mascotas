@@ -117,7 +117,7 @@ func TestNewPetController_BadRequest(t *testing.T) {
 	body := `{"Name":[\]}`
 	response := pet_errors.EntityFormatError
 
-	w, req := newRequest(http.MethodPost, body, "/pets/", nil)
+	w, req := newRequest(http.MethodPost, body, "/pets/pet", nil)
 	mockRouter.ServeRequest(w, req)
 
 	//Assertion
@@ -133,7 +133,7 @@ func TestNewPetController_EmptyRequest(t *testing.T) {
 	body := `{}`
 	response := pet_errors.EntityFormatError
 
-	w, req := newRequest(http.MethodPost, body, "/pets/", nil)
+	w, req := newRequest(http.MethodPost, body, "/pets/pet", nil)
 	mockRouter.ServeRequest(w, req)
 
 	//Assertion
@@ -150,7 +150,7 @@ func TestNewPetController_InvalidAnimalType(t *testing.T) {
 	body := fmt.Sprintf(`{"name": "Raaida", "type": "%s", "birth_date": "2013-05-25", "owner_id": "owner"}`, badType)
 	response := pet_errors.InvalidAnimalType
 
-	w, req := newRequest(http.MethodPost, body, "/pets/", nil)
+	w, req := newRequest(http.MethodPost, body, "/pets/pet", nil)
 	mockRouter.ServeRequest(w, req)
 
 	//Assertion
@@ -167,7 +167,7 @@ func TestNewPetController_InvalidBirthDate(t *testing.T) {
 	body := fmt.Sprintf(`{"name": "Raaida", "type": "dog", "birth_date": "%s", "owner_id": "owner"}`, badDate)
 	response := pet_errors.InvalidBirthDate
 
-	w, req := newRequest(http.MethodPost, body, "/pets/", nil)
+	w, req := newRequest(http.MethodPost, body, "/pets/pet", nil)
 	mockRouter.ServeRequest(w, req)
 
 	//Assertion
@@ -204,7 +204,7 @@ func TestNewPetController_HappyPath(t *testing.T) {
 		requestedPet.OwnerID)
 
 	petPlaceMock.EXPECT().RegisterNewPet(requestedPet).Return(expectedPet, nil)
-	w, req := newRequest(http.MethodPost, rawMsg, "/pets/", nil)
+	w, req := newRequest(http.MethodPost, rawMsg, "/pets/pet", nil)
 	mockRouter.ServeRequest(w, req)
 
 	//Assertion
@@ -224,7 +224,7 @@ func TestGetPetController_InvalidPetId(t *testing.T) {
 	petID := "1234.0" // It must be an integer
 	response := pet_errors.MissingParams
 
-	url := fmt.Sprintf("/pets/%v", petID)
+	url := fmt.Sprintf("/pets/pet/%v", petID)
 	w, req := newRequest(http.MethodGet, "", url, nil)
 	mockRouter.ServeRequest(w, req)
 
@@ -241,7 +241,7 @@ func TestGetPetController_NotFound(t *testing.T) {
 	petID := 1234
 	response := pet_errors.PetNotFound
 
-	url := fmt.Sprintf("/pets/%d", petID)
+	url := fmt.Sprintf("/pets/pet/%d", petID)
 	petPlaceMock.EXPECT().GetPet(petID).Return(data.Pet{}, nil)
 	w, req := newRequest(http.MethodGet, "", url, nil)
 	mockRouter.ServeRequest(w, req)
@@ -253,7 +253,7 @@ func TestGetPetController_NotFound(t *testing.T) {
 func TestGetPetController_ServiceError(t *testing.T) {
 
 	petID := 1234
-	url := fmt.Sprintf("/pets/%d", petID)
+	url := fmt.Sprintf("/pets/pet/%d", petID)
 
 	mockRouter := routes.NewMockRouter()
 	petPlaceMock := services.NewMockPetService(gomock.NewController(t))
@@ -288,7 +288,7 @@ func TestGetPetController_HappyPath(t *testing.T) {
 		OwnerID:      "tfanciotti",
 	}
 
-	url := fmt.Sprintf("/pets/%d", expectedPet.ID)
+	url := fmt.Sprintf("/pets/pet/%d", expectedPet.ID)
 	petPlaceMock.EXPECT().GetPet(expectedPet.ID).Return(expectedPet, nil)
 	w, req := newRequest(http.MethodGet, "", url, nil)
 	mockRouter.ServeRequest(w, req)
