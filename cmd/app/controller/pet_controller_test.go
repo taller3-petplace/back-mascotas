@@ -12,6 +12,7 @@ import (
 	"petplace/back-mascotas/cmd/app/controller"
 	"petplace/back-mascotas/cmd/app/controller/pet_errors"
 	"petplace/back-mascotas/cmd/app/data"
+	"petplace/back-mascotas/cmd/app/db"
 	"petplace/back-mascotas/cmd/app/routes"
 	"petplace/back-mascotas/cmd/app/services"
 	"strings"
@@ -377,7 +378,7 @@ func TestGetPetsByOwnerController_HappyPath(t *testing.T) {
 
 	var allPetsOfTomi = []data.Pet{
 		{
-			ID:           1234,
+			ID:           1,
 			Name:         "Raaida",
 			Type:         "dog",
 			RegisterDate: time.Now(),
@@ -385,7 +386,7 @@ func TestGetPetsByOwnerController_HappyPath(t *testing.T) {
 			OwnerID:      ownerID,
 		},
 		{
-			ID:           12345,
+			ID:           2,
 			Name:         "Javo",
 			Type:         "cat",
 			RegisterDate: time.Now(),
@@ -433,9 +434,17 @@ func TestGetPetsByOwnerController_HappyPath(t *testing.T) {
 	}
 
 	mockRouter := routes.NewMockRouter()
-	petPlaceMock := services.NewMockPetService(gomock.NewController(t))
-	err := mockRouter.AddPetRoutes(petPlaceMock)
+	//petPlaceMock := services.NewMockPetService(gomock.NewController(t))
+
+	fakeDB := db.NewFakeDB()
+	service := services.NewPetPlace(&fakeDB)
+	err := mockRouter.AddPetRoutes(&service)
 	require.NoError(t, err)
+
+	for _, pet := range allPetsOfTomi {
+		_, err := service.RegisterNewPet(pet)
+		require.NoError(t, err)
+	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {
@@ -455,7 +464,7 @@ func TestGetPetsByOwnerController_HappyPath(t *testing.T) {
 			}
 
 			w, req := newRequest(http.MethodGet, "", testCase.Url, nil)
-			petPlaceMock.EXPECT().GetPetsByOwner(searchReq).Return(expectedResult, nil)
+			//petPlaceMock.EXPECT().GetPetsByOwner(searchReq).Return(expectedResult, nil)
 			mockRouter.ServeRequest(w, req)
 
 			assertSearchResult(t, http.StatusOK, expectedResult, w)

@@ -3,7 +3,8 @@ package db
 import "petplace/back-mascotas/cmd/app/data"
 
 type Storabe interface {
-	Save(id string, pet data.Pet) error
-	Get(id string) (data.Pet, error)
-	Delete(id string) error
+	Save(pet *data.Pet) error
+	Get(id int) (data.Pet, error)
+	Delete(id int)
+	GetByOwner(OwnerID string) ([]data.Pet, error)
 }

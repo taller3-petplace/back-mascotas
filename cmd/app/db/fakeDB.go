@@ -6,21 +6,24 @@ import (
 )
 
 type FakeDB struct {
-	data map[string]data.Pet
+	data            map[int]data.Pet
+	lastIdGenerated int
 }
 
 func NewFakeDB() FakeDB {
-	return FakeDB{data: map[string]data.Pet{}}
+	return FakeDB{data: map[int]data.Pet{}, lastIdGenerated: 0}
 }
 
-func (fdb FakeDB) Save(id string, pet data.Pet) error {
+func (fdb *FakeDB) Save(pet *data.Pet) error {
 
-	fdb.data[id] = pet
+	id := fdb.newID()
+	pet.ID = id
+	fdb.data[id] = *pet
 
 	return nil
 }
 
-func (fdb FakeDB) Get(id string) (data.Pet, error) {
+func (fdb *FakeDB) Get(id int) (data.Pet, error) {
 
 	item, ok := fdb.data[id]
 	if !ok {
@@ -30,7 +33,22 @@ func (fdb FakeDB) Get(id string) (data.Pet, error) {
 	return item, nil
 }
 
-func (fdb FakeDB) Delete(id string) error {
+func (fdb *FakeDB) GetByOwner(OwnerID string) ([]data.Pet, error) {
+
+	var result []data.Pet
+	for _, value := range fdb.data {
+		if value.OwnerID == OwnerID {
+			result = append(result, value)
+		}
+	}
+	return result, nil
+}
+
+func (fdb *FakeDB) Delete(id int) {
 	delete(fdb.data, id)
-	return nil
+}
+
+func (fdb *FakeDB) newID() int {
+	fdb.lastIdGenerated++
+	return fdb.lastIdGenerated
 }
