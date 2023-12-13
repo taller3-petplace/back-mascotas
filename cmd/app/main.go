@@ -22,6 +22,7 @@ func main() {
 
 func CreateService() services.PetPlace {
 	fakeDB := db.NewFakeDB()
+	fakeDB.Init()
 	service := services.NewPetPlace(&fakeDB)
 	return service
 }
