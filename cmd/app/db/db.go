@@ -6,5 +6,5 @@ type Storabe interface {
 	Save(pet *data.Pet) error
 	Get(id int) (data.Pet, error)
 	Delete(id int)
-	GetByOwner(OwnerID string) ([]data.Pet, error)
+	GetByOwner(OwnerID int) ([]data.Pet, error)
 }

@@ -148,7 +148,7 @@ func TestNewPetController_InvalidAnimalType(t *testing.T) {
 	require.NoError(t, err)
 
 	badType := "Licha"
-	body := fmt.Sprintf(`{"name": "Raaida", "type": "%s", "birth_date": "2013-05-25", "owner_id": "owner"}`, badType)
+	body := fmt.Sprintf(`{"name": "Raaida", "type": "%s", "birth_date": "2013-05-25", "owner_id": 999}`, badType)
 	response := pet_errors.InvalidAnimalType
 
 	w, req := newRequest(http.MethodPost, body, "/pets/pet", nil)
@@ -165,7 +165,7 @@ func TestNewPetController_InvalidBirthDate(t *testing.T) {
 	require.NoError(t, err)
 
 	badDate := "2000-13-01"
-	body := fmt.Sprintf(`{"name": "Raaida", "type": "dog", "birth_date": "%s", "owner_id": "owner"}`, badDate)
+	body := fmt.Sprintf(`{"name": "Raaida", "type": "dog", "birth_date": "%s", "owner_id": 999}`, badDate)
 	response := pet_errors.InvalidBirthDate
 
 	w, req := newRequest(http.MethodPost, body, "/pets/pet", nil)
@@ -189,7 +189,7 @@ func TestNewPetController_HappyPath(t *testing.T) {
 		Name:      "Pantufla",
 		Type:      "cat",
 		BirthDate: birthDate,
-		OwnerID:   "tfanciotti",
+		OwnerID:   999,
 	}
 	var expectedPet data.Pet
 	expectedPet.Name = requestedPet.Name
@@ -198,7 +198,7 @@ func TestNewPetController_HappyPath(t *testing.T) {
 	expectedPet.BirthDate = requestedPet.BirthDate
 	expectedPet.RegisterDate = time.Now()
 
-	rawMsg := fmt.Sprintf(`{"name": "%s", "type": "%s", "birth_date": "%s", "owner_id": "%s"}`,
+	rawMsg := fmt.Sprintf(`{"name": "%s", "type": "%s", "birth_date": "%s", "owner_id": %d}`,
 		requestedPet.Name,
 		requestedPet.Type,
 		strDate,
@@ -286,7 +286,7 @@ func TestGetPetController_HappyPath(t *testing.T) {
 		Type:         "cat",
 		RegisterDate: time.Now(),
 		BirthDate:    birthDate,
-		OwnerID:      "tfanciotti",
+		OwnerID:      999,
 	}
 
 	url := fmt.Sprintf("/pets/pet/%d", expectedPet.ID)
@@ -328,8 +328,8 @@ func TestGetPetsByOwnerController_InvalidQueryParams(t *testing.T) {
 
 func TestGetPetsByOwnerController_NotFound(t *testing.T) {
 
-	ownerID := "tfanciotti"
-	url := fmt.Sprintf("/pets/owner/%s", ownerID)
+	ownerID := 999
+	url := fmt.Sprintf("/pets/owner/%d", ownerID)
 
 	mockRouter := routes.NewMockRouter()
 	petPlaceMock := services.NewMockPetService(gomock.NewController(t))
@@ -351,8 +351,8 @@ func TestGetPetsByOwnerController_NotFound(t *testing.T) {
 
 func TestGetPetsByOwnerController_ServiceError(t *testing.T) {
 
-	ownerID := "tfanciotti"
-	url := fmt.Sprintf("/pets/owner/%s", ownerID)
+	ownerID := 999
+	url := fmt.Sprintf("/pets/owner/%d", ownerID)
 
 	mockRouter := routes.NewMockRouter()
 	petPlaceMock := services.NewMockPetService(gomock.NewController(t))
@@ -373,8 +373,8 @@ func TestGetPetsByOwnerController_ServiceError(t *testing.T) {
 
 func TestGetPetsByOwnerController_HappyPath(t *testing.T) {
 
-	ownerID := "tfanciotti"
-	baseUrl := fmt.Sprintf("/pets/owner/%s", ownerID)
+	ownerID := 999
+	baseUrl := fmt.Sprintf("/pets/owner/%d", ownerID)
 
 	var allPetsOfTomi = []data.Pet{
 		{
@@ -399,7 +399,7 @@ func TestGetPetsByOwnerController_HappyPath(t *testing.T) {
 		Name   string
 		Result []data.Pet
 		Url    string
-		Owner  string
+		Owner  int
 		Total  uint
 		Offset uint
 		Limit  uint
@@ -411,7 +411,7 @@ func TestGetPetsByOwnerController_HappyPath(t *testing.T) {
 			Total:  2,
 			Offset: 0,
 			Limit:  10,
-			Owner:  "tfanciotti",
+			Owner:  999,
 		},
 		{
 			Name:   "First pet (limit=1)",
@@ -420,7 +420,7 @@ func TestGetPetsByOwnerController_HappyPath(t *testing.T) {
 			Total:  2,
 			Limit:  1,
 			Offset: 0,
-			Owner:  "tfanciotti",
+			Owner:  999,
 		},
 		{
 			Name:   "Second pet (offset=1)",
@@ -429,7 +429,7 @@ func TestGetPetsByOwnerController_HappyPath(t *testing.T) {
 			Total:  2,
 			Limit:  10,
 			Offset: 1,
-			Owner:  "tfanciotti",
+			Owner:  999,
 		},
 	}
 

@@ -6,7 +6,7 @@ type NewPetRequest struct {
 	Name      string     `json:"name" binding:"required"`
 	Type      AnimalType `json:"type" binding:"required"`
 	BirthDate string     `json:"birth_date" binding:"required"`
-	OwnerID   string     `json:"owner_id" binding:"required"`
+	OwnerID   int        `json:"owner_id" binding:"required"`
 }
 
 type Pet struct {
@@ -15,7 +15,7 @@ type Pet struct {
 	Type         AnimalType `json:"type"`
 	RegisterDate time.Time  `json:"register_date"`
 	BirthDate    time.Time  `json:"birth_date"`
-	OwnerID      string     `json:"owner_id"`
+	OwnerID      int        `json:"owner_id"`
 }
 
 func (p Pet) IsZeroValue() bool {

@@ -84,9 +84,14 @@ func (pc *PetController) GetPet(c *gin.Context) {
 
 func (pc *PetController) GetPetsByOwner(c *gin.Context) {
 
-	ownerID, ok := c.Params.Get("owner_id")
-	if !ok || ownerID == "" {
+	ownerIDStr, ok := c.Params.Get("owner_id")
+	if !ok || ownerIDStr == "" {
 		ReturnError(c, http.StatusBadRequest, pet_errors.MissingParams, "expected owner_id")
+		return
+	}
+	ownerID, err := strconv.Atoi(ownerIDStr)
+	if err != nil {
+		ReturnError(c, http.StatusBadRequest, pet_errors.MissingParams, "cannot parse owner_id: "+err.Error())
 		return
 	}
 
@@ -119,7 +124,7 @@ func (pc *PetController) GetPetsByOwner(c *gin.Context) {
 	}
 
 	if len(response.Results) == 0 {
-		ReturnError(c, http.StatusNotFound, pet_errors.PetNotFound, fmt.Sprintf("not found pets for owner: '%s' ", ownerID))
+		ReturnError(c, http.StatusNotFound, pet_errors.PetNotFound, fmt.Sprintf("not found pets for owner: '%d' ", ownerID))
 		return
 	}
 

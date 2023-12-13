@@ -33,7 +33,7 @@ func (fdb *FakeDB) Get(id int) (data.Pet, error) {
 	return item, nil
 }
 
-func (fdb *FakeDB) GetByOwner(OwnerID string) ([]data.Pet, error) {
+func (fdb *FakeDB) GetByOwner(OwnerID int) ([]data.Pet, error) {
 
 	var result []data.Pet
 	for _, value := range fdb.data {

@@ -6,7 +6,7 @@ type SearchRequest struct {
 	Status  string
 	Offset  uint
 	Limit   uint
-	OwnerId string
+	OwnerId int
 }
 
 type Paging struct {
