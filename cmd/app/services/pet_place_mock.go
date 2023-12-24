@@ -9,7 +9,7 @@
 package services
 
 import (
-	data "petplace/back-mascotas/cmd/app/data"
+	data "petplace/back-mascotas/cmd/app/model"
 	reflect "reflect"
 
 	gomock "go.uber.org/mock/gomock"

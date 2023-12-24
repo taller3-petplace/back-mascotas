@@ -5,25 +5,25 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"petplace/back-mascotas/cmd/app/data"
+	"petplace/back-mascotas/cmd/app/model"
 )
 
 const testDataFile = "cmd/app/db/testdata.json"
 
 type FakeDB struct {
-	data            map[int]data.Pet
+	data            map[int]model.Pet
 	lastIdGenerated int
 }
 
 func NewFakeDB() FakeDB {
-	return FakeDB{data: map[int]data.Pet{}, lastIdGenerated: 0}
+	return FakeDB{data: map[int]model.Pet{}, lastIdGenerated: 0}
 }
 
 func (fdb *FakeDB) Init() {
 
 	pets, err := loadTestData(testDataFile)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
-		panic("Error trying to read test data: " + err.Error())
+		panic("Error trying to read test model: " + err.Error())
 	}
 
 	for _, pet := range pets {
@@ -31,7 +31,7 @@ func (fdb *FakeDB) Init() {
 	}
 }
 
-func (fdb *FakeDB) Save(pet *data.Pet) error {
+func (fdb *FakeDB) Save(pet *model.Pet) error {
 
 	id := fdb.newID()
 	pet.ID = id
@@ -45,19 +45,19 @@ func (fdb *FakeDB) Save(pet *data.Pet) error {
 	return nil
 }
 
-func (fdb *FakeDB) Get(id int) (data.Pet, error) {
+func (fdb *FakeDB) Get(id int) (model.Pet, error) {
 
 	item, ok := fdb.data[id]
 	if !ok {
-		return data.Pet{}, errors.New("not found")
+		return model.Pet{}, errors.New("not found")
 	}
 
 	return item, nil
 }
 
-func (fdb *FakeDB) GetByOwner(OwnerID int) ([]data.Pet, error) {
+func (fdb *FakeDB) GetByOwner(OwnerID int) ([]model.Pet, error) {
 
-	var result []data.Pet
+	var result []model.Pet
 	for _, value := range fdb.data {
 		if value.OwnerID == OwnerID {
 			result = append(result, value)
@@ -81,14 +81,14 @@ func (fdb *FakeDB) newID() int {
 	return fdb.lastIdGenerated
 }
 
-func loadTestData(filename string) ([]data.Pet, error) {
+func loadTestData(filename string) ([]model.Pet, error) {
 
 	fileContent, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
 
-	var petsList []data.Pet
+	var petsList []model.Pet
 	err = json.Unmarshal(fileContent, &petsList)
 	if err != nil {
 		return nil, err
@@ -97,9 +97,9 @@ func loadTestData(filename string) ([]data.Pet, error) {
 	return petsList, nil
 }
 
-func dumpToFile(filename string, petsMap map[int]data.Pet) error {
+func dumpToFile(filename string, petsMap map[int]model.Pet) error {
 
-	var petList []data.Pet
+	var petList []model.Pet
 	for _, pet := range petsMap {
 		petList = append(petList, pet)
 	}

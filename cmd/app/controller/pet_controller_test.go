@@ -10,9 +10,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"petplace/back-mascotas/cmd/app/controller"
-	"petplace/back-mascotas/cmd/app/controller/pet_errors"
-	"petplace/back-mascotas/cmd/app/data"
 	"petplace/back-mascotas/cmd/app/db"
+	"petplace/back-mascotas/cmd/app/model"
 	"petplace/back-mascotas/cmd/app/routes"
 	"petplace/back-mascotas/cmd/app/services"
 	"strings"
@@ -39,11 +38,11 @@ func assertHTTPResponse(t *testing.T, expectedStatus int, expectedResponse strin
 
 }
 
-func assertPet(t *testing.T, status int, expectedPet data.Pet, w *httptest.ResponseRecorder) {
+func assertPet(t *testing.T, status int, expectedPet model.Pet, w *httptest.ResponseRecorder) {
 
 	assert.Equal(t, status, w.Code)
 
-	var fetchedPet data.Pet
+	var fetchedPet model.Pet
 	err := json.Unmarshal(w.Body.Bytes(), &fetchedPet)
 	require.NoError(t, err, fmt.Sprintf("body response: %s", w.Body))
 
@@ -57,11 +56,11 @@ func assertPet(t *testing.T, status int, expectedPet data.Pet, w *httptest.Respo
 	assert.Less(t, fetchedPet.RegisterDate, time.Now())
 }
 
-func assertSearchResult(t *testing.T, status int, expectedResponse data.SearchResponse, w *httptest.ResponseRecorder) {
+func assertSearchResult(t *testing.T, status int, expectedResponse model.SearchResponse, w *httptest.ResponseRecorder) {
 
 	assert.Equal(t, status, w.Code)
 
-	var fetched data.SearchResponse
+	var fetched model.SearchResponse
 	err := json.Unmarshal(w.Body.Bytes(), &fetched)
 	require.NoError(t, err, fmt.Sprintf("body response: %s", w.Body))
 
@@ -116,7 +115,7 @@ func TestNewPetController_BadRequest(t *testing.T) {
 	require.NoError(t, err)
 
 	body := `{"Name":[\]}`
-	response := pet_errors.EntityFormatError
+	response := controller.EntityFormatError
 
 	w, req := newRequest(http.MethodPost, body, "/pets/pet", nil)
 	mockRouter.ServeRequest(w, req)
@@ -132,7 +131,7 @@ func TestNewPetController_EmptyRequest(t *testing.T) {
 	require.NoError(t, err)
 
 	body := `{}`
-	response := pet_errors.EntityFormatError
+	response := controller.EntityFormatError
 
 	w, req := newRequest(http.MethodPost, body, "/pets/pet", nil)
 	mockRouter.ServeRequest(w, req)
@@ -149,7 +148,7 @@ func TestNewPetController_InvalidAnimalType(t *testing.T) {
 
 	badType := "Licha"
 	body := fmt.Sprintf(`{"name": "Raaida", "type": "%s", "birth_date": "2013-05-25", "owner_id": 999}`, badType)
-	response := pet_errors.InvalidAnimalType
+	response := controller.InvalidAnimalType
 
 	w, req := newRequest(http.MethodPost, body, "/pets/pet", nil)
 	mockRouter.ServeRequest(w, req)
@@ -166,7 +165,7 @@ func TestNewPetController_InvalidBirthDate(t *testing.T) {
 
 	badDate := "2000-13-01"
 	body := fmt.Sprintf(`{"name": "Raaida", "type": "dog", "birth_date": "%s", "owner_id": 999}`, badDate)
-	response := pet_errors.InvalidBirthDate
+	response := controller.InvalidBirthDate
 
 	w, req := newRequest(http.MethodPost, body, "/pets/pet", nil)
 	mockRouter.ServeRequest(w, req)
@@ -185,13 +184,13 @@ func TestNewPetController_HappyPath(t *testing.T) {
 	birthDate, err := time.Parse(time.DateOnly, strDate)
 	require.NoError(t, err)
 
-	requestedPet := data.Pet{
+	requestedPet := model.Pet{
 		Name:      "Pantufla",
 		Type:      "cat",
 		BirthDate: birthDate,
 		OwnerID:   999,
 	}
-	var expectedPet data.Pet
+	var expectedPet model.Pet
 	expectedPet.Name = requestedPet.Name
 	expectedPet.Type = requestedPet.Type
 	expectedPet.ID = requestedPet.ID
@@ -223,7 +222,7 @@ func TestGetPetController_InvalidPetId(t *testing.T) {
 	require.NoError(t, err)
 
 	petID := "1234.0" // It must be an integer
-	response := pet_errors.MissingParams
+	response := controller.MissingParams
 
 	url := fmt.Sprintf("/pets/pet/%v", petID)
 	w, req := newRequest(http.MethodGet, "", url, nil)
@@ -240,10 +239,10 @@ func TestGetPetController_NotFound(t *testing.T) {
 	require.NoError(t, err)
 
 	petID := 1234
-	response := pet_errors.PetNotFound
+	response := controller.PetNotFound
 
 	url := fmt.Sprintf("/pets/pet/%d", petID)
-	petPlaceMock.EXPECT().GetPet(petID).Return(data.Pet{}, nil)
+	petPlaceMock.EXPECT().GetPet(petID).Return(model.Pet{}, nil)
 	w, req := newRequest(http.MethodGet, "", url, nil)
 	mockRouter.ServeRequest(w, req)
 
@@ -264,7 +263,7 @@ func TestGetPetController_ServiceError(t *testing.T) {
 	expectedError := errors.New("this is a simulated error")
 
 	w, req := newRequest(http.MethodGet, "", url, nil)
-	petPlaceMock.EXPECT().GetPet(petID).Return(data.Pet{}, expectedError)
+	petPlaceMock.EXPECT().GetPet(petID).Return(model.Pet{}, expectedError)
 	mockRouter.ServeRequest(w, req)
 
 	assertError(t, http.StatusInternalServerError, expectedError, w)
@@ -280,7 +279,7 @@ func TestGetPetController_HappyPath(t *testing.T) {
 	birthDate, err := time.Parse(time.DateOnly, strDate)
 	require.NoError(t, err)
 
-	expectedPet := data.Pet{
+	expectedPet := model.Pet{
 		ID:           1234,
 		Name:         "Pantufla",
 		Type:         "cat",
@@ -321,7 +320,7 @@ func TestGetPetsByOwnerController_InvalidQueryParams(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			w, req := newRequest(http.MethodGet, "", url, nil)
 			mockRouter.ServeRequest(w, req)
-			assertError(t, http.StatusBadRequest, pet_errors.MissingParams, w)
+			assertError(t, http.StatusBadRequest, controller.MissingParams, w)
 		})
 	}
 }
@@ -336,16 +335,16 @@ func TestGetPetsByOwnerController_NotFound(t *testing.T) {
 	err := mockRouter.AddPetRoutes(petPlaceMock)
 	require.NoError(t, err)
 
-	searchReq := data.NewSearchRequest()
+	searchReq := model.NewSearchRequest()
 	searchReq.OwnerId = ownerID
 
 	w, req := newRequest(http.MethodGet, "", url, nil)
-	petPlaceMock.EXPECT().GetPetsByOwner(searchReq).Return(data.SearchResponse{
-		Paging:  data.Paging{},
+	petPlaceMock.EXPECT().GetPetsByOwner(searchReq).Return(model.SearchResponse{
+		Paging:  model.Paging{},
 		Results: nil,
 	}, nil)
 	mockRouter.ServeRequest(w, req)
-	assertError(t, http.StatusNotFound, pet_errors.PetNotFound, w)
+	assertError(t, http.StatusNotFound, controller.PetNotFound, w)
 
 }
 
@@ -359,13 +358,13 @@ func TestGetPetsByOwnerController_ServiceError(t *testing.T) {
 	err := mockRouter.AddPetRoutes(petPlaceMock)
 	require.NoError(t, err)
 
-	searchReq := data.NewSearchRequest()
+	searchReq := model.NewSearchRequest()
 	searchReq.OwnerId = ownerID
 
 	expectedError := errors.New("this is a simulated error")
 
 	w, req := newRequest(http.MethodGet, "", url, nil)
-	petPlaceMock.EXPECT().GetPetsByOwner(searchReq).Return(data.SearchResponse{}, expectedError)
+	petPlaceMock.EXPECT().GetPetsByOwner(searchReq).Return(model.SearchResponse{}, expectedError)
 	mockRouter.ServeRequest(w, req)
 	assertError(t, http.StatusInternalServerError, expectedError, w)
 
@@ -376,7 +375,7 @@ func TestGetPetsByOwnerController_HappyPath(t *testing.T) {
 	ownerID := 999
 	baseUrl := fmt.Sprintf("/pets/owner/%d", ownerID)
 
-	var allPetsOfTomi = []data.Pet{
+	var allPetsOfTomi = []model.Pet{
 		{
 			ID:           1,
 			Name:         "Raaida",
@@ -397,7 +396,7 @@ func TestGetPetsByOwnerController_HappyPath(t *testing.T) {
 
 	var testCases = []struct {
 		Name   string
-		Result []data.Pet
+		Result []model.Pet
 		Url    string
 		Owner  int
 		Total  uint
@@ -416,7 +415,7 @@ func TestGetPetsByOwnerController_HappyPath(t *testing.T) {
 		{
 			Name:   "First pet (limit=1)",
 			Url:    baseUrl + "?limit=1",
-			Result: []data.Pet{allPetsOfTomi[0]},
+			Result: []model.Pet{allPetsOfTomi[0]},
 			Total:  2,
 			Limit:  1,
 			Offset: 0,
@@ -425,7 +424,7 @@ func TestGetPetsByOwnerController_HappyPath(t *testing.T) {
 		{
 			Name:   "Second pet (offset=1)",
 			Url:    baseUrl + "?offset=1",
-			Result: []data.Pet{allPetsOfTomi[1]},
+			Result: []model.Pet{allPetsOfTomi[1]},
 			Total:  2,
 			Limit:  10,
 			Offset: 1,
@@ -449,13 +448,13 @@ func TestGetPetsByOwnerController_HappyPath(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.Name, func(t *testing.T) {
 
-			searchReq := data.NewSearchRequest()
+			searchReq := model.NewSearchRequest()
 			searchReq.OwnerId = ownerID
 			searchReq.Limit = testCase.Limit
 			searchReq.Offset = testCase.Offset
 
-			var expectedResult = data.SearchResponse{
-				Paging: data.Paging{
+			var expectedResult = model.SearchResponse{
+				Paging: model.Paging{
 					Total:  testCase.Total,
 					Offset: testCase.Offset,
 					Limit:  testCase.Limit,

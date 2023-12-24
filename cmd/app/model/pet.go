@@ -1,13 +1,6 @@
-package data
+package model
 
 import "time"
-
-type NewPetRequest struct {
-	Name      string     `json:"name" binding:"required"`
-	Type      AnimalType `json:"type" binding:"required"`
-	BirthDate string     `json:"birth_date" binding:"required"`
-	OwnerID   int        `json:"owner_id" binding:"required"`
-}
 
 type Pet struct {
 	ID           int        `json:"id"`

@@ -1,10 +1,10 @@
 package db
 
-import "petplace/back-mascotas/cmd/app/data"
+import "petplace/back-mascotas/cmd/app/model"
 
-type Storabe interface {
-	Save(pet *data.Pet) error
-	Get(id int) (data.Pet, error)
+type Storable interface {
+	Save(pet *model.Pet) error
+	Get(id int) (model.Pet, error)
 	Delete(id int)
-	GetByOwner(OwnerID int) ([]data.Pet, error)
+	GetByOwner(OwnerID int) ([]model.Pet, error)
 }

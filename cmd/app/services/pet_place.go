@@ -2,28 +2,28 @@ package services
 
 import (
 	"errors"
-	"petplace/back-mascotas/cmd/app/data"
 	"petplace/back-mascotas/cmd/app/db"
+	"petplace/back-mascotas/cmd/app/model"
 	"time"
 )
 
 type PetService interface {
-	RegisterNewPet(pet data.Pet) (data.Pet, error)
-	GetPet(petID int) (data.Pet, error)
-	GetPetsByOwner(request data.SearchRequest) (data.SearchResponse, error)
-	EditPet(pet data.Pet) (data.Pet, error)
+	RegisterNewPet(pet model.Pet) (model.Pet, error)
+	GetPet(petID int) (model.Pet, error)
+	GetPetsByOwner(request model.SearchRequest) (model.SearchResponse, error)
+	EditPet(pet model.Pet) (model.Pet, error)
 	DeletePet(petID int)
 }
 
 type PetPlace struct {
-	db db.Storabe
+	db db.Storable
 }
 
-func NewPetPlace(db db.Storabe) PetPlace {
+func NewPetPlace(db db.Storable) PetPlace {
 	return PetPlace{db: db}
 }
 
-func (pp *PetPlace) RegisterNewPet(pet data.Pet) (data.Pet, error) {
+func (pp *PetPlace) RegisterNewPet(pet model.Pet) (model.Pet, error) {
 
 	pet.RegisterDate = time.Now()
 	err := pp.db.Save(&pet)
@@ -32,28 +32,28 @@ func (pp *PetPlace) RegisterNewPet(pet data.Pet) (data.Pet, error) {
 
 }
 
-func (pp *PetPlace) GetPet(petID int) (data.Pet, error) {
+func (pp *PetPlace) GetPet(petID int) (model.Pet, error) {
 	getPet, err := pp.db.Get(petID)
 	if err != nil {
-		return data.Pet{}, err
+		return model.Pet{}, err
 	}
 	return getPet, nil
 }
 
-func (pp *PetPlace) GetPetsByOwner(request data.SearchRequest) (data.SearchResponse, error) {
+func (pp *PetPlace) GetPetsByOwner(request model.SearchRequest) (model.SearchResponse, error) {
 
 	pets, err := pp.db.GetByOwner(request.OwnerId)
 	if err != nil {
-		return data.SearchResponse{}, errors.New("error fetching from db")
+		return model.SearchResponse{}, errors.New("error fetching from db")
 	}
 
-	result := data.SearchResponse{
-		Paging: data.Paging{
+	result := model.SearchResponse{
+		Paging: model.Paging{
 			Total:  uint(len(pets)),
 			Offset: request.Offset,
 			Limit:  request.Limit,
 		},
-		Results: []data.Pet{},
+		Results: []model.Pet{},
 	}
 
 	from := min(result.Paging.Offset, result.Paging.Total)
@@ -63,7 +63,7 @@ func (pp *PetPlace) GetPetsByOwner(request data.SearchRequest) (data.SearchRespo
 	return result, nil
 }
 
-func (pp *PetPlace) EditPet(pet data.Pet) (data.Pet, error) {
+func (pp *PetPlace) EditPet(pet model.Pet) (model.Pet, error) {
 	err := pp.db.Save(&pet)
 	return pet, err
 }
