@@ -68,18 +68,18 @@ func (pc *PetController) GetPet(c *gin.Context) {
 		return
 	}
 
-	newPet, err := pc.petPlace.GetPet(petID)
+	pet, err := pc.petPlace.GetPet(petID)
 	if err != nil {
 		ReturnError(c, http.StatusInternalServerError, pet_errors.ServiceError, err.Error())
 		return
 	}
 
-	if newPet.IsZeroValue() {
+	if pet.IsZeroValue() {
 		ReturnError(c, http.StatusNotFound, pet_errors.PetNotFound, fmt.Sprintf("pet with id '%d' not found", petID))
 		return
 	}
 
-	c.JSON(http.StatusOK, newPet)
+	c.JSON(http.StatusOK, pet)
 }
 
 func (pc *PetController) GetPetsByOwner(c *gin.Context) {
@@ -141,7 +141,22 @@ func (pc *PetController) EditPet(c *gin.Context) {
 }
 
 func (pc *PetController) DeletePet(c *gin.Context) {
-	c.JSON(http.StatusNoContent, gin.H{"message": "to be implemented"})
+
+	petIDStr, ok := c.Params.Get("pet_id")
+	if !ok || petIDStr == "" {
+		ReturnError(c, http.StatusBadRequest, pet_errors.MissingParams, "expected pet_id")
+		return
+	}
+
+	petID, err := strconv.Atoi(petIDStr)
+	if err != nil {
+		ReturnError(c, http.StatusBadRequest, pet_errors.MissingParams, "cannot parse pet_id: "+err.Error())
+		return
+	}
+
+	pc.petPlace.DeletePet(petID)
+
+	c.JSON(http.StatusOK, nil)
 }
 
 func validAnimalType(animalType data.AnimalType) bool {

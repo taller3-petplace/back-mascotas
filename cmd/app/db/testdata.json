@@ -1,5 +1,13 @@
 [
   {
+    "id": 5,
+    "name": "Pumba",
+    "type": "dog",
+    "register_date": "2023-12-24T13:41:16.17244-03:00",
+    "birth_date": "2021-05-30T00:00:00Z",
+    "owner_id": 738528032
+  },
+  {
     "id": 1,
     "name": "Raaida",
     "type": "dog",
@@ -8,7 +16,15 @@
     "owner_id": 2
   },
   {
-    "id": 2,
+    "id": 3,
+    "name": "Pumba",
+    "type": "dog",
+    "register_date": "2023-12-24T13:41:24.245861-03:00",
+    "birth_date": "2021-05-30T00:00:00Z",
+    "owner_id": 738528032
+  },
+  {
+    "id": 4,
     "name": "Javo",
     "type": "cat",
     "register_date": "2023-12-13T01:13:45.265968-03:00",
@@ -16,7 +32,7 @@
     "owner_id": 2
   },
   {
-    "id": 3,
+    "id": 7,
     "name": "Ringo",
     "type": "dog",
     "register_date": "2023-12-13T01:15:08.611987-03:00",
@@ -24,7 +40,15 @@
     "owner_id": 738528032
   },
   {
-    "id": 4,
+    "id": 8,
+    "name": "Pumba",
+    "type": "dog",
+    "register_date": "2023-12-24T13:41:23.351885-03:00",
+    "birth_date": "2021-05-30T00:00:00Z",
+    "owner_id": 738528032
+  },
+  {
+    "id": 11,
     "name": "Pumba",
     "type": "dog",
     "register_date": "2023-12-13T01:16:21.405748-03:00",

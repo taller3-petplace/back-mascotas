@@ -8,7 +8,7 @@ import (
 	"petplace/back-mascotas/cmd/app/data"
 )
 
-const testDataFile = "testdata.json"
+const testDataFile = "cmd/app/db/testdata.json"
 
 type FakeDB struct {
 	data            map[int]data.Pet

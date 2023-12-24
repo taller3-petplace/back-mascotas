@@ -9,8 +9,10 @@ import (
 
 type PetService interface {
 	RegisterNewPet(pet data.Pet) (data.Pet, error)
-	GetPet(pet int) (data.Pet, error)
+	GetPet(petID int) (data.Pet, error)
 	GetPetsByOwner(request data.SearchRequest) (data.SearchResponse, error)
+	EditPet(pet data.Pet) (data.Pet, error)
+	DeletePet(petID int)
 }
 
 type PetPlace struct {
@@ -59,4 +61,13 @@ func (pp *PetPlace) GetPetsByOwner(request data.SearchRequest) (data.SearchRespo
 	result.Results = pets[from:to]
 
 	return result, nil
+}
+
+func (pp *PetPlace) EditPet(pet data.Pet) (data.Pet, error) {
+	err := pp.db.Save(&pet)
+	return pet, err
+}
+
+func (pp *PetPlace) DeletePet(petID int) {
+	pp.db.Delete(petID)
 }

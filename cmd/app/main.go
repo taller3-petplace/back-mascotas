@@ -9,7 +9,7 @@ import (
 func main() {
 
 	s := CreateService()
-	r := routes.NewRouter(":8712")
+	r := routes.NewRouter(":8001")
 
 	r.AddPingRoute()
 	err := r.AddPetRoutes(&s)
