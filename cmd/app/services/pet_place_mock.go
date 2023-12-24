@@ -21,6 +21,16 @@ type MockPetService struct {
 	recorder *MockPetServiceMockRecorder
 }
 
+func (m *MockPetService) EditPet(pet data.Pet) (data.Pet, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockPetService) DeletePet(petID int) {
+	//TODO implement me
+	panic("implement me")
+}
+
 // MockPetServiceMockRecorder is the mock recorder for MockPetService.
 type MockPetServiceMockRecorder struct {
 	mock *MockPetService
