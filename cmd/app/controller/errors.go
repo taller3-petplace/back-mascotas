@@ -7,11 +7,12 @@ import (
 
 var (
 	EntityFormatError = errors.New("entity could not be mapped")
+	ValidationError   = errors.New("invalid entity")
 	RegisterError     = errors.New("error trying to register pet")
 	InvalidAnimalType = errors.New("invalid animal type")
 	InvalidBirthDate  = errors.New("invalid birth_date")
 	MissingParams     = errors.New("missing params on request")
-	PetNotFound       = errors.New("pet not found")
+	EntityNotFound    = errors.New("entity not found")
 	ServiceError      = errors.New("service error")
 )
 

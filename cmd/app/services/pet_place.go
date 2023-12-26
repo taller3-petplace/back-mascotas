@@ -4,18 +4,20 @@ import (
 	"errors"
 	"petplace/back-mascotas/cmd/app/db"
 	"petplace/back-mascotas/cmd/app/model"
+	"slices"
 	"time"
 )
 
 type PetService interface {
-	RegisterNewPet(pet model.Pet) (model.Pet, error)
-	GetPet(petID int) (model.Pet, error)
+	New(pet model.Pet) (model.Pet, error)
+	Get(petID int) (model.Pet, error)
+	Edit(petID int, pet model.Pet) (model.Pet, error)
+	Delete(petID int)
 	GetPetsByOwner(request model.SearchRequest) (model.SearchResponse, error)
-	EditPet(pet model.Pet) (model.Pet, error)
-	DeletePet(petID int)
 }
 
 type PetPlace struct {
+	ABMService[model.Pet]
 	db db.Storable
 }
 
@@ -23,7 +25,7 @@ func NewPetPlace(db db.Storable) PetPlace {
 	return PetPlace{db: db}
 }
 
-func (pp *PetPlace) RegisterNewPet(pet model.Pet) (model.Pet, error) {
+func (pp *PetPlace) New(pet model.Pet) (model.Pet, error) {
 
 	pet.RegisterDate = time.Now()
 	err := pp.db.Save(&pet)
@@ -32,9 +34,9 @@ func (pp *PetPlace) RegisterNewPet(pet model.Pet) (model.Pet, error) {
 
 }
 
-func (pp *PetPlace) GetPet(petID int) (model.Pet, error) {
+func (pp *PetPlace) Get(petID int) (model.Pet, error) {
 	getPet, err := pp.db.Get(petID)
-	if err != nil {
+	if err != nil && errors.Is(err, errors.New("not found")) {
 		return model.Pet{}, err
 	}
 	return getPet, nil
@@ -56,6 +58,10 @@ func (pp *PetPlace) GetPetsByOwner(request model.SearchRequest) (model.SearchRes
 		Results: []model.Pet{},
 	}
 
+	slices.SortFunc(pets, func(a, b model.Pet) int {
+		return a.ID - b.ID
+	})
+
 	from := min(result.Paging.Offset, result.Paging.Total)
 	to := min(result.Paging.Offset+result.Paging.Limit, result.Paging.Total)
 	result.Results = pets[from:to]
@@ -63,11 +69,11 @@ func (pp *PetPlace) GetPetsByOwner(request model.SearchRequest) (model.SearchRes
 	return result, nil
 }
 
-func (pp *PetPlace) EditPet(pet model.Pet) (model.Pet, error) {
+func (pp *PetPlace) Edit(id int, pet model.Pet) (model.Pet, error) {
 	err := pp.db.Save(&pet)
 	return pet, err
 }
 
-func (pp *PetPlace) DeletePet(petID int) {
+func (pp *PetPlace) Delete(petID int) {
 	pp.db.Delete(petID)
 }
