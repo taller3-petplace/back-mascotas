@@ -1,10 +1,14 @@
 package db
 
-import "petplace/back-mascotas/cmd/app/model"
+type StorableItem struct {
+	ID   int
+	Data interface{}
+}
 
 type Storable interface {
-	Save(pet *model.Pet) error
-	Get(id int) (model.Pet, error)
-	Delete(id int)
-	GetByOwner(OwnerID int) ([]model.Pet, error)
+	NewID() int
+	Save(table string, data interface{}) (*StorableItem, error)
+	Get(table string, id int) (*StorableItem, error)
+	Delete(table string, id int)
+	GetFiltered(table string, filter func(StorableItem) bool) ([]StorableItem, error)
 }

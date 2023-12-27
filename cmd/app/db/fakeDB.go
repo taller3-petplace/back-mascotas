@@ -5,69 +5,82 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"petplace/back-mascotas/cmd/app/model"
 )
 
 const testDataFile = "cmd/app/db/testdata.json"
 
 type FakeDB struct {
-	data            map[int]model.Pet
+	data            map[string]map[int]StorableItem
 	lastIdGenerated int
 }
 
 func NewFakeDB() FakeDB {
-	return FakeDB{data: map[int]model.Pet{}, lastIdGenerated: 0}
+	return FakeDB{data: map[string]map[int]StorableItem{}, lastIdGenerated: 0}
 }
 
 func (fdb *FakeDB) Init() {
 
-	pets, err := loadTestData(testDataFile)
+	db, err := loadTestData(testDataFile)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		panic("Error trying to read test model: " + err.Error())
 	}
 
-	for _, pet := range pets {
-		_ = fdb.Save(&pet)
+	if db != nil {
+		fdb.data = db
+		lastID := 0
+		for _, table := range fdb.data {
+			for _, item := range table {
+				lastID = max(lastID, item.ID)
+			}
+		}
+		fdb.lastIdGenerated = lastID
 	}
 }
 
-func (fdb *FakeDB) Save(pet *model.Pet) error {
+func (fdb *FakeDB) Save(table string, data interface{}) (*StorableItem, error) {
 
-	id := fdb.newID()
-	pet.ID = id
-	fdb.data[id] = *pet
+	fdb.checkTable(table)
+
+	item := fdb.getStorableItem(data)
+	fdb.data[table][item.ID] = item
 
 	err := dumpToFile(testDataFile, fdb.data)
 	if err != nil {
 		fmt.Println("ERROR DUMP: " + err.Error())
 	}
 
-	return nil
+	return &item, nil
 }
 
-func (fdb *FakeDB) Get(id int) (model.Pet, error) {
+func (fdb *FakeDB) Get(table string, id int) (*StorableItem, error) {
 
-	item, ok := fdb.data[id]
+	fdb.checkTable(table)
+
+	item, ok := fdb.data[table][id]
 	if !ok {
-		return model.Pet{}, errors.New("not found")
+		return nil, errors.New("not found")
 	}
 
-	return item, nil
+	return &item, nil
 }
 
-func (fdb *FakeDB) GetByOwner(OwnerID int) ([]model.Pet, error) {
+func (fdb *FakeDB) GetFiltered(table string, filter func(item StorableItem) bool) ([]StorableItem, error) {
 
-	var result []model.Pet
-	for _, value := range fdb.data {
-		if value.OwnerID == OwnerID {
-			result = append(result, value)
+	var result []StorableItem
+	for _, item := range fdb.data[table] {
+
+		if filter(item) {
+			result = append(result, item)
 		}
 	}
 	return result, nil
 }
 
-func (fdb *FakeDB) Delete(id int) {
-	delete(fdb.data, id)
+func (fdb *FakeDB) Delete(table string, id int) {
+
+	fdb.checkTable(table)
+
+	delete(fdb.data[table], id)
 
 	err := dumpToFile(testDataFile, fdb.data)
 	if err != nil {
@@ -76,35 +89,37 @@ func (fdb *FakeDB) Delete(id int) {
 
 }
 
-func (fdb *FakeDB) newID() int {
+func (fdb *FakeDB) NewID() int {
 	fdb.lastIdGenerated++
 	return fdb.lastIdGenerated
 }
 
-func loadTestData(filename string) ([]model.Pet, error) {
+func (fdb *FakeDB) checkTable(table string) {
+	_, ok := fdb.data[table]
+	if !ok {
+		fdb.data[table] = map[int]StorableItem{}
+	}
+}
+
+func loadTestData(filename string) (map[string]map[int]StorableItem, error) {
 
 	fileContent, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
 
-	var petsList []model.Pet
-	err = json.Unmarshal(fileContent, &petsList)
+	var data map[string]map[int]StorableItem
+	err = json.Unmarshal(fileContent, &data)
 	if err != nil {
 		return nil, err
 	}
 
-	return petsList, nil
+	return data, nil
 }
 
-func dumpToFile(filename string, petsMap map[int]model.Pet) error {
+func dumpToFile(filename string, data map[string]map[int]StorableItem) error {
 
-	var petList []model.Pet
-	for _, pet := range petsMap {
-		petList = append(petList, pet)
-	}
-
-	jsonData, err := json.MarshalIndent(petList, "", "  ")
+	jsonData, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
 		return err
 	}
@@ -113,4 +128,17 @@ func dumpToFile(filename string, petsMap map[int]model.Pet) error {
 		return err
 	}
 	return nil
+}
+
+func (fdb *FakeDB) getStorableItem(data interface{}) StorableItem {
+
+	switch v := data.(type) {
+	case StorableItem:
+		return v
+	}
+
+	return StorableItem{
+		ID:   fdb.NewID(),
+		Data: data,
+	}
 }
