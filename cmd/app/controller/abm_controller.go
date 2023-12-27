@@ -61,18 +61,18 @@ func (abm *ABMController[Entity]) Get(c *gin.Context) {
 		return
 	}
 
-	pet, err := abm.s.Get(id)
+	e, err := abm.s.Get(id)
 	if err != nil {
 		ReturnError(c, http.StatusInternalServerError, ServiceError, err.Error())
 		return
 	}
 
-	if pet.IsZeroValue() {
+	if e.IsZeroValue() {
 		ReturnError(c, http.StatusNotFound, EntityNotFound, fmt.Sprintf("entity id '%d' not found", id))
 		return
 	}
 
-	c.JSON(http.StatusOK, pet)
+	c.JSON(http.StatusOK, e)
 }
 
 func (abm *ABMController[Entity]) Edit(c *gin.Context) {
@@ -82,20 +82,36 @@ func (abm *ABMController[Entity]) Edit(c *gin.Context) {
 		return
 	}
 
-	var e Entity
-	err := c.BindJSON(&e)
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		ReturnError(c, http.StatusBadRequest, MissingParams, "cannot parse id: "+err.Error())
+		return
+	}
+
+	e, err := abm.s.Get(id)
+	if err != nil {
+		ReturnError(c, http.StatusInternalServerError, RegisterError, err.Error())
+		return
+	}
+	if e.IsZeroValue() {
+		ReturnError(c, http.StatusNotFound, EntityNotFound, fmt.Sprintf("entity id '%d' not found", id))
+		return
+	}
+
+	var patchEntity Entity
+	err = c.BindJSON(&patchEntity)
 	if err != nil {
 		ReturnError(c, http.StatusBadRequest, EntityFormatError, err.Error())
 		return
 	}
 
-	err = abm.Validate(e)
+	err = abm.Validate(patchEntity)
 	if err != nil {
 		ReturnError(c, http.StatusBadRequest, ValidationError, err.Error())
 		return
 	}
 
-	e, err = abm.s.New(e)
+	e, err = abm.s.Edit(id, patchEntity)
 	if err != nil {
 		ReturnError(c, http.StatusInternalServerError, RegisterError, err.Error())
 		return
