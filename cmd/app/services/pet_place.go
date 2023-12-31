@@ -6,7 +6,7 @@ import (
 	"petplace/back-mascotas/cmd/app/db"
 	"petplace/back-mascotas/cmd/app/db/objects"
 	"petplace/back-mascotas/cmd/app/model"
-	"slices"
+	"strconv"
 	"time"
 )
 
@@ -39,7 +39,7 @@ func (pp *PetPlace) New(pet model.Pet) (model.Pet, error) {
 	if err != nil {
 		return model.Pet{}, err
 	}
-	pet.ID = object.ID
+	pet.ID = int(object.ID)
 	return pet, nil
 
 }
@@ -57,14 +57,10 @@ func (pp *PetPlace) Get(petID int) (model.Pet, error) {
 
 func (pp *PetPlace) GetPetsByOwner(request model.SearchRequest) (model.SearchResponse, error) {
 
-	err := pp.db.GetFiltered(func(item interface{}) bool {
-		return item.(model.Pet).OwnerID == request.OwnerId
-	})
-
-	var pets []model.Pet
-	for _, item := range pets {
-		pets = append(pets, item)
-	}
+	var objects []objects.Pet
+	total, err := pp.db.GetFiltered(&objects, map[string]string{
+		"owner_id": strconv.Itoa(request.OwnerId),
+	}, "Name ASC", int(request.Limit), int(request.Offset))
 
 	if err != nil {
 		return model.SearchResponse{}, errors.New("error fetching from db")
@@ -72,20 +68,16 @@ func (pp *PetPlace) GetPetsByOwner(request model.SearchRequest) (model.SearchRes
 
 	result := model.SearchResponse{
 		Paging: model.Paging{
-			Total:  uint(len(pets)),
+			Total:  uint(total),
 			Offset: request.Offset,
 			Limit:  request.Limit,
 		},
 		Results: []model.Pet{},
 	}
 
-	slices.SortFunc(pets, func(a, b model.Pet) int {
-		return int(a.ID) - int(b.ID)
-	})
-
-	from := min(result.Paging.Offset, result.Paging.Total)
-	to := min(result.Paging.Offset+result.Paging.Limit, result.Paging.Total)
-	result.Results = pets[from:to]
+	for _, object := range objects {
+		result.Results = append(result.Results, object.ToModel())
+	}
 
 	return result, nil
 }

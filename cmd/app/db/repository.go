@@ -49,6 +49,41 @@ func (r *Repository) Delete(id int, object interface{}) error {
 	}
 	return nil
 }
-func (r *Repository) GetFiltered(filter func(interface{}) bool) error {
-	return nil
+func (r *Repository) GetFiltered(result interface{}, filters map[string]string, orderBy string, limit int, offset int) (int64, error) {
+	// Obtener la cantidad total de filas sin limitación
+	var totalCount int64
+	queryCount := r.db.Model(result)
+	queryCount = applyFilters(queryCount, filters)
+	err := queryCount.Count(&totalCount).Error
+	if err != nil {
+		return 0, err
+	}
+
+	// Construir la consulta principal
+	query := r.db.Model(result)
+	query = applyFilters(query, filters)
+
+	// Aplicar criterio de ordenamiento
+	if orderBy != "" {
+		query = query.Order(orderBy)
+	}
+
+	// Aplicar límite y desplazamiento
+	query = query.Limit(limit).Offset(offset)
+
+	// Ejecutar la consulta principal
+	if err := query.Find(result).Error; err != nil {
+		return 0, err
+	}
+
+	return totalCount, nil
+
+}
+
+// applyFilters aplica los filtros a la consulta
+func applyFilters(query *gorm.DB, filters map[string]string) *gorm.DB {
+	for campo, valor := range filters {
+		query = query.Where(campo, valor)
+	}
+	return query
 }

@@ -18,7 +18,7 @@ type Pet struct {
 }
 
 func (p *Pet) FromModel(pet model.Pet) {
-	p.ID = pet.ID
+	p.ID = uint(pet.ID)
 	p.Name = pet.Name
 	p.Type = string(pet.Type)
 	p.CreatedAt = pet.RegisterDate
@@ -29,7 +29,7 @@ func (p *Pet) FromModel(pet model.Pet) {
 func (p *Pet) ToModel() model.Pet {
 
 	var pet model.Pet
-	pet.ID = p.ID
+	pet.ID = int(p.ID)
 	pet.Name = p.Name
 	pet.Type = model.AnimalType(p.Type)
 	pet.RegisterDate = p.CreatedAt
