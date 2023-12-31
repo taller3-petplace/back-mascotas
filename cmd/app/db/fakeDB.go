@@ -7,7 +7,12 @@ import (
 	"os"
 )
 
-const testDataFile = "cmd/app/db/testdata.json"
+const testDataFile = "cmd/app/db/git .json"
+
+type StorableItem struct {
+	ID   int
+	Data interface{}
+}
 
 type FakeDB struct {
 	data            map[string]map[int]StorableItem
