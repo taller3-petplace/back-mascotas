@@ -98,20 +98,19 @@ func (abm *ABMController[Entity]) Edit(c *gin.Context) {
 		return
 	}
 
-	var patchEntity Entity
-	err = c.BindJSON(&patchEntity)
+	err = c.BindJSON(&e)
 	if err != nil {
 		ReturnError(c, http.StatusBadRequest, EntityFormatError, err.Error())
 		return
 	}
 
-	err = abm.Validate(patchEntity)
+	err = abm.Validate(e)
 	if err != nil {
 		ReturnError(c, http.StatusBadRequest, ValidationError, err.Error())
 		return
 	}
 
-	e, err = abm.s.Edit(id, patchEntity)
+	e, err = abm.s.Edit(id, e)
 	if err != nil {
 		ReturnError(c, http.StatusInternalServerError, RegisterError, err.Error())
 		return
