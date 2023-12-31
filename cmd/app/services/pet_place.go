@@ -1,9 +1,10 @@
 package services
 
 import (
-	"encoding/json"
 	"errors"
+	"fmt"
 	"petplace/back-mascotas/cmd/app/db"
+	"petplace/back-mascotas/cmd/app/db/objects"
 	"petplace/back-mascotas/cmd/app/model"
 	"slices"
 	"time"
@@ -31,45 +32,38 @@ func NewPetPlace(db db.Storable) PetPlace {
 func (pp *PetPlace) New(pet model.Pet) (model.Pet, error) {
 
 	pet.RegisterDate = time.Now()
-	item, err := pp.db.Save(tableName, pet)
-	pet.ID = item.ID
 
-	newItem := db.StorableItem{
-		ID:   item.ID,
-		Data: pet,
-	}
-
-	// Update de ID
-	_, err = pp.db.Save(tableName, newItem)
+	var object objects.Pet
+	object.FromModel(pet)
+	err := pp.db.Save(&object)
 	if err != nil {
 		return model.Pet{}, err
 	}
-
-	return pet, err
+	pet.ID = object.ID
+	return pet, nil
 
 }
 
 func (pp *PetPlace) Get(petID int) (model.Pet, error) {
-	item, err := pp.db.Get(tableName, petID)
+
+	var object objects.Pet
+	err := pp.db.Get(petID, &object)
 	if err != nil && errors.Is(err, errors.New("not found")) {
 		return model.Pet{}, err
 	}
-	if item == nil {
-		return model.Pet{}, nil
-	}
 
-	return getPetFromItem(*item), nil
+	return object.ToModel(), nil
 }
 
 func (pp *PetPlace) GetPetsByOwner(request model.SearchRequest) (model.SearchResponse, error) {
 
-	items, err := pp.db.GetFiltered(tableName, func(item db.StorableItem) bool {
-		return getPetFromItem(item).OwnerID == request.OwnerId
+	err := pp.db.GetFiltered(func(item interface{}) bool {
+		return item.(model.Pet).OwnerID == request.OwnerId
 	})
 
 	var pets []model.Pet
-	for _, item := range items {
-		pets = append(pets, getPetFromItem(item))
+	for _, item := range pets {
+		pets = append(pets, item)
 	}
 
 	if err != nil {
@@ -86,7 +80,7 @@ func (pp *PetPlace) GetPetsByOwner(request model.SearchRequest) (model.SearchRes
 	}
 
 	slices.SortFunc(pets, func(a, b model.Pet) int {
-		return a.ID - b.ID
+		return int(a.ID) - int(b.ID)
 	})
 
 	from := min(result.Paging.Offset, result.Paging.Total)
@@ -97,32 +91,20 @@ func (pp *PetPlace) GetPetsByOwner(request model.SearchRequest) (model.SearchRes
 }
 
 func (pp *PetPlace) Edit(petID int, pet model.Pet) (model.Pet, error) {
-	pet.ID = petID
-	item := db.StorableItem{
-		ID:   petID,
-		Data: pet,
+
+	var object objects.Pet
+	object.FromModel(pet)
+	err := pp.db.Save(&object)
+	if err != nil {
+		fmt.Println(err)
 	}
-	_, err := pp.db.Save(tableName, item)
-	return pet, err
+	return object.ToModel(), nil
 }
 
 func (pp *PetPlace) Delete(petID int) {
-	pp.db.Delete(tableName, petID)
-}
-
-func getPetFromItem(item db.StorableItem) model.Pet {
-
-	switch v := item.Data.(type) {
-	case model.Pet:
-		return v
-	}
-
-	var result model.Pet
-	d, _ := json.Marshal(item.Data)
-	err := json.Unmarshal(d, &result)
+	var object objects.Pet
+	err := pp.db.Delete(petID, &object)
 	if err != nil {
-		return model.Pet{}
+		fmt.Println(err)
 	}
-
-	return result
 }

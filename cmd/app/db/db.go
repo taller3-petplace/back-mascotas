@@ -1,14 +1,8 @@
 package db
 
-type StorableItem struct {
-	ID   int
-	Data interface{}
-}
-
 type Storable interface {
-	NewID() int
-	Save(table string, data interface{}) (*StorableItem, error)
-	Get(table string, id int) (*StorableItem, error)
-	Delete(table string, id int)
-	GetFiltered(table string, filter func(StorableItem) bool) ([]StorableItem, error)
+	Save(data interface{}) error
+	Get(id int, data interface{}) error
+	Delete(id int, data interface{}) error
+	GetFiltered(filter func(interface{}) bool) error
 }
