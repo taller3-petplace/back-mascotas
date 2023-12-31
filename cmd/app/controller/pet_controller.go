@@ -26,7 +26,7 @@ func NewPetController(service services.PetService) PremiumPetController {
 
 func ValidateNewAnimal(pet model.Pet) error {
 
-	if !validAnimalType(pet.Type) {
+	if !model.ValidAnimalType(pet.Type) {
 		return InvalidAnimalType
 	}
 	return nil
