@@ -26,6 +26,11 @@ func main() {
 		panic(err)
 	}
 
+	err = r.AddSwaggerRoutes()
+	if err != nil {
+		panic(err)
+	}
+
 	r.Run()
 }
 

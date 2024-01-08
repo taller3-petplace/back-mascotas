@@ -1,11 +1,11 @@
 package model
 
 type Vaccine struct {
-	ID          int
-	Animal      AnimalType
-	Name        string
-	Description string
-	Scheduled   uint
+	ID          int        `json:"id"`
+	Animal      AnimalType `json:"animal"`
+	Name        string     `json:"name"`
+	Description string     `json:"description"`
+	Scheduled   uint       `json:"scheduled"`
 }
 
 func (v Vaccine) IsZeroValue() bool {

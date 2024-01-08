@@ -1,0 +1,258 @@
+definitions:
+  controller.APIError:
+    properties:
+      message:
+        type: string
+      status:
+        type: integer
+    type: object
+  model.AnimalType:
+    enum:
+    - dog
+    - cat
+    - bird
+    - hamster
+    type: string
+    x-enum-varnames:
+    - Dog
+    - Cat
+    - Bird
+    - Hamster
+  model.Pet:
+    properties:
+      birth_date:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      owner_id:
+        type: integer
+      register_date:
+        type: string
+      type:
+        $ref: '#/definitions/model.AnimalType'
+    type: object
+  model.Vaccine:
+    properties:
+      animal:
+        $ref: '#/definitions/model.AnimalType'
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      scheduled:
+        type: integer
+    type: object
+info:
+  contact: {}
+paths:
+  /pets/pet:
+    post:
+      consumes:
+      - application/json
+      description: Create a pet for a given user
+      parameters:
+      - description: pet info
+        in: body
+        name: pet
+        required: true
+        schema:
+          $ref: '#/definitions/model.Pet'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Pet'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.APIError'
+      summary: Creates a Pet
+      tags:
+      - Pet
+  /pets/pet/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a pet given a pet ID
+      parameters:
+      - description: id of the pet
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.APIError'
+      summary: Delete a Pet
+      tags:
+      - Pet
+    get:
+      consumes:
+      - application/json
+      description: Get pet info given a pet ID
+      parameters:
+      - description: id of the pet
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Pet'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.APIError'
+      summary: Get a Pet
+      tags:
+      - Pet
+    put:
+      consumes:
+      - application/json
+      description: Edit pet info given a pet ID and pet info needed to update
+      parameters:
+      - description: id of the pet
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: pet info
+        in: body
+        name: pet
+        required: true
+        schema:
+          $ref: '#/definitions/model.Pet'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Pet'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.APIError'
+      summary: Edit a Pet
+      tags:
+      - Pet
+  /vaccines/vaccine:
+    post:
+      consumes:
+      - application/json
+      description: Create a vaccine
+      parameters:
+      - description: vaccine info
+        in: body
+        name: vaccine
+        required: true
+        schema:
+          $ref: '#/definitions/model.Vaccine'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Vaccine'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.APIError'
+      summary: Creates a Vaccine
+      tags:
+      - Vaccine
+  /vaccines/vaccine/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a Vaccine given a pet ID
+      parameters:
+      - description: id of the vaccine
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.APIError'
+      summary: Delete a Vaccine
+      tags:
+      - Vaccine
+    get:
+      consumes:
+      - application/json
+      description: Get vaccine info
+      parameters:
+      - description: id of the vaccine
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Vaccine'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.APIError'
+      summary: Get a Vaccine
+      tags:
+      - Vaccine
+    put:
+      consumes:
+      - application/json
+      description: Edit vaccine info given a pet ID and vaccine info needed to update
+      parameters:
+      - description: id of the vaccine
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: vaccine info
+        in: body
+        name: vaccine
+        required: true
+        schema:
+          $ref: '#/definitions/model.Vaccine'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Vaccine'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.APIError'
+      summary: Edit a Vaccine
+      tags:
+      - Vaccine
+swagger: "2.0"

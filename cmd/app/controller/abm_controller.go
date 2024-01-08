@@ -136,5 +136,5 @@ func (abm *ABMController[Entity]) Delete(c *gin.Context) {
 
 	abm.s.Delete(id)
 
-	c.JSON(http.StatusOK, "{}")
+	c.JSON(http.StatusNoContent, nil)
 }

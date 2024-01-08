@@ -9,7 +9,7 @@ type Pet struct {
 	Name         string     `json:"name"`
 	Type         AnimalType `json:"type"`
 	RegisterDate time.Time  `json:"register_date"`
-	BirthDate    Date       `json:"birth_date"`
+	BirthDate    Date       `json:"birth_date" swaggertype:"string"`
 	OwnerID      int        `json:"owner_id"`
 }
 

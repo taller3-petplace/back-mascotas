@@ -17,7 +17,7 @@ var (
 )
 
 type APIError struct {
-	error
+	error   `swaggerignore:"true"`
 	Status  int    `json:"status"`
 	Message string `json:"message"`
 }
