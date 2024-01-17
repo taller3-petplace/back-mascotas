@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"petplace/back-mascotas/cmd/app/controller"
-	"petplace/back-mascotas/cmd/app/services"
+	"petplace/back-mascotas/controller"
+	"petplace/back-mascotas/services"
 )
 
 func (r *Routes) AddPetRoutes(service services.PetService) error {

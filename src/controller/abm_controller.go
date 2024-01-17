@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"petplace/back-mascotas/cmd/app/services"
+	"petplace/back-mascotas/services"
 	"strconv"
 )
 

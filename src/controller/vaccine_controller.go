@@ -2,12 +2,12 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
-	"petplace/back-mascotas/cmd/app/model"
-	"petplace/back-mascotas/cmd/app/services"
+	model2 "petplace/back-mascotas/model"
+	"petplace/back-mascotas/services"
 )
 
 type VaccineController struct {
-	ABMController[model.Vaccine]
+	ABMController[model2.Vaccine]
 	service services.VaccineService
 }
 
@@ -21,9 +21,9 @@ func NewVaccineController(service services.VaccineService) VaccineController {
 	return temp
 }
 
-func ValidateVaccine(v model.Vaccine) error {
+func ValidateVaccine(v model2.Vaccine) error {
 
-	if !model.ValidAnimalType(v.Animal) {
+	if !model2.ValidAnimalType(v.Animal) {
 		return InvalidAnimalType
 	}
 	return nil

@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"petplace/back-mascotas/cmd/app/model"
-	"petplace/back-mascotas/cmd/app/services"
+	model2 "petplace/back-mascotas/model"
+	"petplace/back-mascotas/services"
 	"strconv"
 )
 
 type PremiumPetController struct {
-	ABMController[model.Pet]
+	ABMController[model2.Pet]
 	service services.PetService
 }
 
@@ -24,9 +24,9 @@ func NewPetController(service services.PetService) PremiumPetController {
 	return temp
 }
 
-func ValidateNewAnimal(pet model.Pet) error {
+func ValidateNewAnimal(pet model2.Pet) error {
 
-	if !model.ValidAnimalType(pet.Type) {
+	if !model2.ValidAnimalType(pet.Type) {
 		return InvalidAnimalType
 	}
 	return nil
@@ -57,7 +57,7 @@ func (pc *PremiumPetController) GetPetsByOwner(c *gin.Context) {
 		return
 	}
 
-	searchRequest := model.NewSearchRequest()
+	searchRequest := model2.NewSearchRequest()
 	offsetStr := c.Query("offset")
 	if offsetStr != "" {
 		offset, err := strconv.Atoi(offsetStr)
