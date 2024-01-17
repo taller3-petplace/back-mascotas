@@ -1,7 +1,7 @@
 package objects
 
 import (
-	model2 "petplace/back-mascotas/model"
+	"petplace/back-mascotas/src/model"
 )
 
 type Vaccine struct {
@@ -12,17 +12,17 @@ type Vaccine struct {
 	Scheduled   uint
 }
 
-func (v *Vaccine) ToModel() model2.Vaccine {
-	return model2.Vaccine{
+func (v *Vaccine) ToModel() model.Vaccine {
+	return model.Vaccine{
 		ID:          v.ID,
-		Animal:      model2.AnimalType(v.Animal),
+		Animal:      model.AnimalType(v.Animal),
 		Name:        v.Name,
 		Description: v.Description,
 		Scheduled:   v.Scheduled,
 	}
 }
 
-func (v *Vaccine) FromModel(vaccine model2.Vaccine) {
+func (v *Vaccine) FromModel(vaccine model.Vaccine) {
 	v.ID = vaccine.ID
 	v.Animal = string(vaccine.Animal)
 	v.Name = vaccine.Name

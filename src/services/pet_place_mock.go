@@ -9,7 +9,7 @@
 package services
 
 import (
-	model2 "petplace/back-mascotas/model"
+	"petplace/back-mascotas/src/model"
 	reflect "reflect"
 
 	gomock "go.uber.org/mock/gomock"
@@ -51,10 +51,10 @@ func (mr *MockPetServiceMockRecorder) Delete(petID any) *gomock.Call {
 }
 
 // Edit mocks base method.
-func (m *MockPetService) Edit(petID int, pet model2.Pet) (model2.Pet, error) {
+func (m *MockPetService) Edit(petID int, pet model.Pet) (model.Pet, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Edit", petID, pet)
-	ret0, _ := ret[0].(model2.Pet)
+	ret0, _ := ret[0].(model.Pet)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -66,10 +66,10 @@ func (mr *MockPetServiceMockRecorder) Edit(petID, pet any) *gomock.Call {
 }
 
 // Get mocks base method.
-func (m *MockPetService) Get(petID int) (model2.Pet, error) {
+func (m *MockPetService) Get(petID int) (model.Pet, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", petID)
-	ret0, _ := ret[0].(model2.Pet)
+	ret0, _ := ret[0].(model.Pet)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -81,10 +81,10 @@ func (mr *MockPetServiceMockRecorder) Get(petID any) *gomock.Call {
 }
 
 // GetPetsByOwner mocks base method.
-func (m *MockPetService) GetPetsByOwner(request model2.SearchRequest) (model2.SearchResponse, error) {
+func (m *MockPetService) GetPetsByOwner(request model.SearchRequest) (model.SearchResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetPetsByOwner", request)
-	ret0, _ := ret[0].(model2.SearchResponse)
+	ret0, _ := ret[0].(model.SearchResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -96,10 +96,10 @@ func (mr *MockPetServiceMockRecorder) GetPetsByOwner(request any) *gomock.Call {
 }
 
 // New mocks base method.
-func (m *MockPetService) New(pet model2.Pet) (model2.Pet, error) {
+func (m *MockPetService) New(pet model.Pet) (model.Pet, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "New", pet)
-	ret0, _ := ret[0].(model2.Pet)
+	ret0, _ := ret[0].(model.Pet)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

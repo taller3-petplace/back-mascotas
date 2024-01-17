@@ -2,9 +2,9 @@ package services
 
 import (
 	"fmt"
-	"petplace/back-mascotas/db"
-	"petplace/back-mascotas/db/objects"
-	"petplace/back-mascotas/model"
+	"petplace/back-mascotas/src/db"
+	"petplace/back-mascotas/src/db/objects"
+	"petplace/back-mascotas/src/model"
 )
 
 type VaccineService struct {
