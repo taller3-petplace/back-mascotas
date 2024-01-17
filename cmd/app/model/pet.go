@@ -1,13 +1,15 @@
 package model
 
-import "time"
+import (
+	"time"
+)
 
 type Pet struct {
 	ID           int        `json:"id"`
 	Name         string     `json:"name"`
 	Type         AnimalType `json:"type"`
 	RegisterDate time.Time  `json:"register_date"`
-	BirthDate    time.Time  `json:"birth_date"`
+	BirthDate    Date       `json:"birth_date" swaggertype:"string"`
 	OwnerID      int        `json:"owner_id"`
 }
 
@@ -23,10 +25,4 @@ func (p Pet) IsZeroValue() bool {
 	result = result && (p.OwnerID == zeroValue.OwnerID)
 
 	return result
-}
-
-type Race struct {
-	Type string `json:"type"`
-	Fur  string `json:"fur"`
-	Size int32  `json:"size"`
 }

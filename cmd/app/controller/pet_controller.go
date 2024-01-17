@@ -4,85 +4,47 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"petplace/back-mascotas/cmd/app/controller/dto"
 	"petplace/back-mascotas/cmd/app/model"
 	"petplace/back-mascotas/cmd/app/services"
 	"strconv"
-	"time"
 )
 
-type PetController struct {
-	petPlace services.PetService
+type PremiumPetController struct {
+	ABMController[model.Pet]
+	service services.PetService
 }
 
-func NewPetController(service services.PetService) PetController {
-	return PetController{petPlace: service}
+func NewPetController(service services.PetService) PremiumPetController {
+
+	temp := PremiumPetController{}
+	temp.service = service
+	temp.s = service
+	temp.Validate = ValidateNewAnimal
+
+	return temp
 }
 
-func (pc *PetController) NewPet(c *gin.Context) {
+func ValidateNewAnimal(pet model.Pet) error {
 
-	var request dto.NewPetRequest
-	err := c.BindJSON(&request)
-	if err != nil {
-		ReturnError(c, http.StatusBadRequest, EntityFormatError, err.Error())
-		return
+	if !model.ValidAnimalType(pet.Type) {
+		return InvalidAnimalType
 	}
-
-	if !validAnimalType(request.Type) {
-		ReturnError(c, http.StatusBadRequest, InvalidAnimalType, fmt.Sprintf("unexpected animal '%s'", request.Type))
-		return
-	}
-
-	birthDate, err := time.Parse(time.DateOnly, request.BirthDate)
-	if err != nil {
-		ReturnError(c, http.StatusBadRequest, InvalidBirthDate, fmt.Sprintf("error parsing birth_date"))
-		return
-	}
-
-	var newPet model.Pet
-	newPet.Type = request.Type.Normalice()
-	newPet.Name = request.Name
-	newPet.OwnerID = request.OwnerID
-	newPet.BirthDate = birthDate
-
-	newPet, err = pc.petPlace.RegisterNewPet(newPet)
-	if err != nil {
-		ReturnError(c, http.StatusInternalServerError, RegisterError, err.Error())
-		return
-	}
-
-	c.JSON(http.StatusCreated, newPet)
+	return nil
 }
 
-func (pc *PetController) GetPet(c *gin.Context) {
+// Tuvieja godoc
+//
+//	@Summary		Creates a treatment
+//	@Description	Create a treatment for a given animal
+//	@Tags			Treatment request
+//	@Accept			json
+//	@Produce		json
+//	@Param			treatment	body   model.SearchRequest	true	"TBD"
+//	@Success		200		{object}	model.SearchResponse
+//	@Failure		400		{object}	nil
+//	@Router			/treatments/treatment [post]
 
-	petIDStr, ok := c.Params.Get("pet_id")
-	if !ok || petIDStr == "" {
-		ReturnError(c, http.StatusBadRequest, MissingParams, "expected pet_id")
-		return
-	}
-
-	petID, err := strconv.Atoi(petIDStr)
-	if err != nil {
-		ReturnError(c, http.StatusBadRequest, MissingParams, "cannot parse pet_id: "+err.Error())
-		return
-	}
-
-	pet, err := pc.petPlace.GetPet(petID)
-	if err != nil {
-		ReturnError(c, http.StatusInternalServerError, ServiceError, err.Error())
-		return
-	}
-
-	if pet.IsZeroValue() {
-		ReturnError(c, http.StatusNotFound, PetNotFound, fmt.Sprintf("pet with id '%d' not found", petID))
-		return
-	}
-
-	c.JSON(http.StatusOK, pet)
-}
-
-func (pc *PetController) GetPetsByOwner(c *gin.Context) {
+func (pc *PremiumPetController) GetPetsByOwner(c *gin.Context) {
 
 	ownerIDStr, ok := c.Params.Get("owner_id")
 	if !ok || ownerIDStr == "" {
@@ -117,14 +79,14 @@ func (pc *PetController) GetPetsByOwner(c *gin.Context) {
 	}
 
 	searchRequest.OwnerId = ownerID
-	response, err := pc.petPlace.GetPetsByOwner(searchRequest)
+	response, err := pc.service.GetPetsByOwner(searchRequest)
 	if err != nil {
 		ReturnError(c, http.StatusInternalServerError, ServiceError, err.Error())
 		return
 	}
 
 	if len(response.Results) == 0 {
-		ReturnError(c, http.StatusNotFound, PetNotFound, fmt.Sprintf("not found pets for owner: '%d' ", ownerID))
+		ReturnError(c, http.StatusNotFound, EntityNotFound, fmt.Sprintf("not found pets for owner: '%d' ", ownerID))
 		return
 	}
 
@@ -132,40 +94,63 @@ func (pc *PetController) GetPetsByOwner(c *gin.Context) {
 
 }
 
-func (pc *PetController) SearchPet(c *gin.Context) {
-	c.JSON(http.StatusNoContent, gin.H{"message": "to be implemented"})
+// New godoc
+//
+//	@Summary		Creates a Pet
+//	@Description	Create a pet for a given user
+//	@Tags			Pet
+//	@Accept			json
+//	@Produce		json
+//	@Param			pet	body   model.Pet	true	"pet info"
+//	@Success		201		{object}	model.Pet
+//	@Failure		400		{object}	APIError
+//	@Router			/pets/pet [post]
+func (pc *PremiumPetController) New(c *gin.Context) {
+	pc.ABMController.New(c)
 }
 
-func (pc *PetController) EditPet(c *gin.Context) {
-	c.JSON(http.StatusNoContent, gin.H{"message": "to be implemented"})
+// Get godoc
+//
+//	@Summary		Get a Pet
+//	@Description	Get pet info given a pet ID
+//	@Tags			Pet
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path   int	true	"id of the pet"
+//	@Success		200		{object}	model.Pet
+//	@Failure		400		{object}	APIError
+//	@Router			/pets/pet/{id} [get]
+func (pc *PremiumPetController) Get(c *gin.Context) {
+	pc.ABMController.Get(c)
 }
 
-func (pc *PetController) DeletePet(c *gin.Context) {
-
-	petIDStr, ok := c.Params.Get("pet_id")
-	if !ok || petIDStr == "" {
-		ReturnError(c, http.StatusBadRequest, MissingParams, "expected pet_id")
-		return
-	}
-
-	petID, err := strconv.Atoi(petIDStr)
-	if err != nil {
-		ReturnError(c, http.StatusBadRequest, MissingParams, "cannot parse pet_id: "+err.Error())
-		return
-	}
-
-	pc.petPlace.DeletePet(petID)
-
-	c.JSON(http.StatusOK, nil)
+// Edit godoc
+//
+//	@Summary		Edit a Pet
+//	@Description	Edit pet info given a pet ID and pet info needed to update
+//	@Tags			Pet
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path   int	true	"id of the pet"
+//	@Param			pet	body   model.Pet	true	"pet info"
+//	@Success		200		{object}	model.Pet
+//	@Failure		400		{object}	APIError
+//	@Router			/pets/pet/{id} [put]
+func (pc *PremiumPetController) Edit(c *gin.Context) {
+	pc.ABMController.Edit(c)
 }
 
-func validAnimalType(animalType model.AnimalType) bool {
-
-	var normalized = animalType.Normalice()
-	for _, t := range model.AnimalTypes {
-		if t == normalized {
-			return true
-		}
-	}
-	return false
+// Delete godoc
+//
+//	@Summary		Delete a Pet
+//	@Description	Delete a pet given a pet ID
+//	@Tags			Pet
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path   int	true	"id of the pet"
+//	@Success		204		{object}	nil
+//	@Failure		400		{object}	APIError
+//	@Router			/pets/pet/{id} [delete]
+func (pc *PremiumPetController) Delete(c *gin.Context) {
+	pc.ABMController.Delete(c)
 }

@@ -10,11 +10,11 @@ func (r *Routes) AddPetRoutes(service services.PetService) error {
 
 	group := r.engine.Group("/pets")
 
-	group.POST("/pet", c.NewPet)
-	group.GET("/pet/:pet_id", c.GetPet)
+	group.POST("/pet", c.New)
+	group.GET("/pet/:id", c.Get)
 	group.GET("/owner/:owner_id", c.GetPetsByOwner)
-	group.PUT("/pet/:pet_id", c.EditPet)      // TODO
-	group.DELETE("/pet/:pet_id", c.DeletePet) // TODO
+	group.PUT("/pet/:id", c.Edit)
+	group.DELETE("/pet/:id", c.Delete)
 
 	return nil
 

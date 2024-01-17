@@ -1,10 +1,8 @@
 package db
 
-import "petplace/back-mascotas/cmd/app/model"
-
 type Storable interface {
-	Save(pet *model.Pet) error
-	Get(id int) (model.Pet, error)
-	Delete(id int)
-	GetByOwner(OwnerID int) ([]model.Pet, error)
+	Save(data interface{}) error
+	Get(id int, data interface{}) error
+	Delete(id int, data interface{}) error
+	GetFiltered(result interface{}, filter map[string]string, orderBy string, limit int, offset int) (int64, error)
 }

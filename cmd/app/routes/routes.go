@@ -42,6 +42,6 @@ func (r *Routes) AddPingRoute() {
 		func(c *gin.Context) { c.JSON(http.StatusOK, gin.H{"message": "pong"}) })
 }
 
-func (r Routes) ServeRequest(w http.ResponseWriter, req *http.Request) {
+func (r *Routes) ServeRequest(w http.ResponseWriter, req *http.Request) {
 	r.engine.ServeHTTP(w, req)
 }

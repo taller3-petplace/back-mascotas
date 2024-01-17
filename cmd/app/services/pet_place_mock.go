@@ -9,7 +9,7 @@
 package services
 
 import (
-	data "petplace/back-mascotas/cmd/app/model"
+	model "petplace/back-mascotas/cmd/app/model"
 	reflect "reflect"
 
 	gomock "go.uber.org/mock/gomock"
@@ -19,16 +19,6 @@ import (
 type MockPetService struct {
 	ctrl     *gomock.Controller
 	recorder *MockPetServiceMockRecorder
-}
-
-func (m *MockPetService) EditPet(pet data.Pet) (data.Pet, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (m *MockPetService) DeletePet(petID int) {
-	//TODO implement me
-	panic("implement me")
 }
 
 // MockPetServiceMockRecorder is the mock recorder for MockPetService.
@@ -48,26 +38,53 @@ func (m *MockPetService) EXPECT() *MockPetServiceMockRecorder {
 	return m.recorder
 }
 
-// GetPet mocks base method.
-func (m *MockPetService) GetPet(pet int) (data.Pet, error) {
+// Delete mocks base method.
+func (m *MockPetService) Delete(petID int) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetPet", pet)
-	ret0, _ := ret[0].(data.Pet)
+	m.ctrl.Call(m, "Delete", petID)
+}
+
+// Delete indicates an expected call of Delete.
+func (mr *MockPetServiceMockRecorder) Delete(petID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockPetService)(nil).Delete), petID)
+}
+
+// Edit mocks base method.
+func (m *MockPetService) Edit(petID int, pet model.Pet) (model.Pet, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Edit", petID, pet)
+	ret0, _ := ret[0].(model.Pet)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetPet indicates an expected call of GetPet.
-func (mr *MockPetServiceMockRecorder) GetPet(pet any) *gomock.Call {
+// Edit indicates an expected call of Edit.
+func (mr *MockPetServiceMockRecorder) Edit(petID, pet any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPet", reflect.TypeOf((*MockPetService)(nil).GetPet), pet)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Edit", reflect.TypeOf((*MockPetService)(nil).Edit), petID, pet)
+}
+
+// Get mocks base method.
+func (m *MockPetService) Get(petID int) (model.Pet, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Get", petID)
+	ret0, _ := ret[0].(model.Pet)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Get indicates an expected call of Get.
+func (mr *MockPetServiceMockRecorder) Get(petID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockPetService)(nil).Get), petID)
 }
 
 // GetPetsByOwner mocks base method.
-func (m *MockPetService) GetPetsByOwner(request data.SearchRequest) (data.SearchResponse, error) {
+func (m *MockPetService) GetPetsByOwner(request model.SearchRequest) (model.SearchResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetPetsByOwner", request)
-	ret0, _ := ret[0].(data.SearchResponse)
+	ret0, _ := ret[0].(model.SearchResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -78,17 +95,17 @@ func (mr *MockPetServiceMockRecorder) GetPetsByOwner(request any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPetsByOwner", reflect.TypeOf((*MockPetService)(nil).GetPetsByOwner), request)
 }
 
-// RegisterNewPet mocks base method.
-func (m *MockPetService) RegisterNewPet(pet data.Pet) (data.Pet, error) {
+// New mocks base method.
+func (m *MockPetService) New(pet model.Pet) (model.Pet, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RegisterNewPet", pet)
-	ret0, _ := ret[0].(data.Pet)
+	ret := m.ctrl.Call(m, "New", pet)
+	ret0, _ := ret[0].(model.Pet)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// RegisterNewPet indicates an expected call of RegisterNewPet.
-func (mr *MockPetServiceMockRecorder) RegisterNewPet(pet any) *gomock.Call {
+// New indicates an expected call of New.
+func (mr *MockPetServiceMockRecorder) New(pet any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterNewPet", reflect.TypeOf((*MockPetService)(nil).RegisterNewPet), pet)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "New", reflect.TypeOf((*MockPetService)(nil).New), pet)
 }

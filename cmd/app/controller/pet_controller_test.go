@@ -130,7 +130,7 @@ func TestNewPetController_EmptyRequest(t *testing.T) {
 	err := mockRouter.AddPetRoutes(petPlaceMock)
 	require.NoError(t, err)
 
-	body := `{}`
+	body := ``
 	response := controller.EntityFormatError
 
 	w, req := newRequest(http.MethodPost, body, "/pets/pet", nil)
@@ -165,7 +165,7 @@ func TestNewPetController_InvalidBirthDate(t *testing.T) {
 
 	badDate := "2000-13-01"
 	body := fmt.Sprintf(`{"name": "Raaida", "type": "dog", "birth_date": "%s", "owner_id": 999}`, badDate)
-	response := controller.InvalidBirthDate
+	response := controller.EntityFormatError
 
 	w, req := newRequest(http.MethodPost, body, "/pets/pet", nil)
 	mockRouter.ServeRequest(w, req)
@@ -181,7 +181,7 @@ func TestNewPetController_HappyPath(t *testing.T) {
 	require.NoError(t, err)
 
 	strDate := "2006-01-02"
-	birthDate, err := time.Parse(time.DateOnly, strDate)
+	birthDate, err := model.NewDate(strDate)
 	require.NoError(t, err)
 
 	requestedPet := model.Pet{
@@ -203,7 +203,7 @@ func TestNewPetController_HappyPath(t *testing.T) {
 		strDate,
 		requestedPet.OwnerID)
 
-	petPlaceMock.EXPECT().RegisterNewPet(requestedPet).Return(expectedPet, nil)
+	petPlaceMock.EXPECT().New(requestedPet).Return(expectedPet, nil)
 	w, req := newRequest(http.MethodPost, rawMsg, "/pets/pet", nil)
 	mockRouter.ServeRequest(w, req)
 
@@ -239,10 +239,10 @@ func TestGetPetController_NotFound(t *testing.T) {
 	require.NoError(t, err)
 
 	petID := 1234
-	response := controller.PetNotFound
+	response := controller.EntityNotFound
 
 	url := fmt.Sprintf("/pets/pet/%d", petID)
-	petPlaceMock.EXPECT().GetPet(petID).Return(model.Pet{}, nil)
+	petPlaceMock.EXPECT().Get(petID).Return(model.Pet{}, nil)
 	w, req := newRequest(http.MethodGet, "", url, nil)
 	mockRouter.ServeRequest(w, req)
 
@@ -263,7 +263,7 @@ func TestGetPetController_ServiceError(t *testing.T) {
 	expectedError := errors.New("this is a simulated error")
 
 	w, req := newRequest(http.MethodGet, "", url, nil)
-	petPlaceMock.EXPECT().GetPet(petID).Return(model.Pet{}, expectedError)
+	petPlaceMock.EXPECT().Get(petID).Return(model.Pet{}, expectedError)
 	mockRouter.ServeRequest(w, req)
 
 	assertError(t, http.StatusInternalServerError, expectedError, w)
@@ -276,7 +276,7 @@ func TestGetPetController_HappyPath(t *testing.T) {
 	require.NoError(t, err)
 
 	strDate := "2006-01-02"
-	birthDate, err := time.Parse(time.DateOnly, strDate)
+	birthDate, err := model.NewDate(strDate)
 	require.NoError(t, err)
 
 	expectedPet := model.Pet{
@@ -289,7 +289,7 @@ func TestGetPetController_HappyPath(t *testing.T) {
 	}
 
 	url := fmt.Sprintf("/pets/pet/%d", expectedPet.ID)
-	petPlaceMock.EXPECT().GetPet(expectedPet.ID).Return(expectedPet, nil)
+	petPlaceMock.EXPECT().Get(expectedPet.ID).Return(expectedPet, nil)
 	w, req := newRequest(http.MethodGet, "", url, nil)
 	mockRouter.ServeRequest(w, req)
 
@@ -344,7 +344,7 @@ func TestGetPetsByOwnerController_NotFound(t *testing.T) {
 		Results: nil,
 	}, nil)
 	mockRouter.ServeRequest(w, req)
-	assertError(t, http.StatusNotFound, controller.PetNotFound, w)
+	assertError(t, http.StatusNotFound, controller.EntityNotFound, w)
 
 }
 
@@ -381,7 +381,7 @@ func TestGetPetsByOwnerController_HappyPath(t *testing.T) {
 			Name:         "Raaida",
 			Type:         "dog",
 			RegisterDate: time.Now(),
-			BirthDate:    time.Time{},
+			BirthDate:    model.Date{},
 			OwnerID:      ownerID,
 		},
 		{
@@ -389,7 +389,7 @@ func TestGetPetsByOwnerController_HappyPath(t *testing.T) {
 			Name:         "Javo",
 			Type:         "cat",
 			RegisterDate: time.Now(),
-			BirthDate:    time.Time{},
+			BirthDate:    model.Date{},
 			OwnerID:      ownerID,
 		},
 	}
@@ -441,7 +441,7 @@ func TestGetPetsByOwnerController_HappyPath(t *testing.T) {
 	require.NoError(t, err)
 
 	for _, pet := range allPetsOfTomi {
-		_, err := service.RegisterNewPet(pet)
+		_, err := service.New(pet)
 		require.NoError(t, err)
 	}
 
