@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"petplace/back-mascotas/cmd/app/config"
 	"petplace/back-mascotas/cmd/app/db"
 	"petplace/back-mascotas/cmd/app/db/objects"
 	"petplace/back-mascotas/cmd/app/routes"
@@ -9,14 +11,19 @@ import (
 
 func main() {
 
-	repository := initDB()
+	appConfig, err := config.LoadConfig()
+	if err != nil {
+		panic(err)
+	}
+
+	repository := initDB(appConfig.DbURL)
 
 	pp := services.NewPetPlace(&repository)
 	vs := services.NewVaccineService(&repository)
 
-	r := routes.NewRouter(":8001")
+	r := routes.NewRouter(fmt.Sprintf(":%d", appConfig.Port))
 	r.AddPingRoute()
-	err := r.AddPetRoutes(&pp)
+	err = r.AddPetRoutes(&pp)
 	if err != nil {
 		panic(err)
 	}
@@ -34,9 +41,9 @@ func main() {
 	r.Run()
 }
 
-func initDB() db.Repository {
+func initDB(url string) db.Repository {
 
-	r, err := db.NewRepository("admin:admin@tcp(localhost:3306)/pets?parseTime=true")
+	r, err := db.NewRepository(url)
 	if err != nil {
 		panic(err)
 	}
