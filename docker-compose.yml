@@ -21,3 +21,15 @@ services:
       - POSTGRES_DB=pets
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=admin
+
+  back:
+    container_name: back-mascotas
+    image: back-mascotas
+    ports:
+      - 9001:9001
+    environment:
+      - PORT=9001
+      - DB_URL=postgres://admin:admin@pets-postgres:5432/pets?sslmode=disable
+    depends_on:
+      - pets-mysql
+      - pets-postgres
