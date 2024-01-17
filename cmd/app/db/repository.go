@@ -2,6 +2,7 @@ package db
 
 import (
 	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
@@ -12,8 +13,17 @@ type Repository struct {
 	db  *gorm.DB
 }
 
-func NewRepository(url string) (Repository, error) {
+func NewMySqlRepository(url string) (Repository, error) {
 	db, err := gorm.Open(mysql.Open(url), &gorm.Config{})
+	if err != nil {
+		return Repository{}, err
+	}
+
+	return Repository{url: url, db: db}, nil
+}
+
+func NewPostgresRepository(url string) (Repository, error) {
+	db, err := gorm.Open(postgres.Open(url), &gorm.Config{})
 	if err != nil {
 		return Repository{}, err
 	}

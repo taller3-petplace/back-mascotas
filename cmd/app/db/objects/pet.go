@@ -10,10 +10,10 @@ type Pet struct {
 	ID        uint `gorm:"primaryKey;autoIncrement;unique"`
 	Name      string
 	Type      string
-	CreatedAt time.Time `gorm:"type:datetime"`
-	UpdatedAt time.Time
-	BirthDate time.Time `gorm:"type:datetime"`
-	DeletedAt gorm.DeletedAt
+	CreatedAt time.Time      `gorm:"type:timestamp"`
+	UpdatedAt time.Time      `gorm:"type:timestamptz"`
+	BirthDate time.Time      `gorm:"type:date"`
+	DeletedAt gorm.DeletedAt `gorm:"type:timestamptz"`
 	OwnerID   int
 }
 

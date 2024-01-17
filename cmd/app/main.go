@@ -43,7 +43,7 @@ func main() {
 
 func initDB(url string) db.Repository {
 
-	r, err := db.NewRepository(url)
+	r, err := db.NewPostgresRepository(url)
 	if err != nil {
 		panic(err)
 	}
