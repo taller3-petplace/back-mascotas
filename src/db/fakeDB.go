@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-const testDataFile = "cmd/app/db/git .json"
+const testDataFile = "testData.json"
 
 type StorableItem struct {
 	ID   int

@@ -20,7 +20,7 @@ func NewPetController(service services.PetService) PremiumPetController {
 	temp.service = service
 	temp.s = service
 	temp.Validate = ValidateNewAnimal
-
+	temp.name = "PET"
 	return temp
 }
 

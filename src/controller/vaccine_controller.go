@@ -17,7 +17,7 @@ func NewVaccineController(service services.VaccineService) VaccineController {
 	temp.service = service
 	temp.s = &service
 	temp.Validate = ValidateVaccine
-
+	temp.name = "VACCINE"
 	return temp
 }
 

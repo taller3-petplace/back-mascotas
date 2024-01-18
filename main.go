@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"petplace/back-mascotas/src/config"
 	"petplace/back-mascotas/src/db"
 	"petplace/back-mascotas/src/db/objects"
@@ -15,6 +16,12 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	err = config.InitLogger(appConfig.LogLevel)
+	if err != nil {
+		log.Error(err)
+	}
+	log.Info("Log level: ", log.GetLevel())
 
 	repository := initDB(appConfig.DbURL)
 

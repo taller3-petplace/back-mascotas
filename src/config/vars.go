@@ -11,8 +11,9 @@ import (
 const envFile = ".env"
 
 type AppConfig struct {
-	Port  int
-	DbURL string
+	Port     int
+	DbURL    string
+	LogLevel string
 }
 
 func LoadConfig() (AppConfig, error) {
@@ -20,6 +21,13 @@ func LoadConfig() (AppConfig, error) {
 	var config AppConfig
 	if err := godotenv.Load(); err != nil {
 		log.Print("error cargando el archivo: ", err)
+	}
+
+	loglevel := os.Getenv("LOG")
+	if loglevel == "" {
+		config.LogLevel = "INFO"
+	} else {
+		config.LogLevel = loglevel
 	}
 
 	portStr := os.Getenv("PORT")
