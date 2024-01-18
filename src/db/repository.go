@@ -1,6 +1,7 @@
 package db
 
 import (
+	"errors"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -47,7 +48,7 @@ func (r *Repository) Save(data interface{}) error {
 func (r *Repository) Get(id int, object interface{}) error {
 
 	result := r.db.First(object, id)
-	if result.Error != nil {
+	if result.Error != nil && !errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return result.Error
 	}
 	return nil

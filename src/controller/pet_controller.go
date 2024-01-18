@@ -39,9 +39,9 @@ func ValidateNewAnimal(pet model.Pet) error {
 //	@Tags			Treatment request
 //	@Accept			json
 //	@Produce		json
-//	@Param			treatment	body   model.SearchRequest	true	"TBD"
-//	@Success		200		{object}	model.SearchResponse
-//	@Failure		400		{object}	nil
+//	@Param			treatment	body		model.SearchRequest	true	"TBD"
+//	@Success		200			{object}	model.SearchResponse
+//	@Failure		400			{object}	nil
 //	@Router			/treatments/treatment [post]
 
 func (pc *PremiumPetController) GetPetsByOwner(c *gin.Context) {
@@ -101,9 +101,9 @@ func (pc *PremiumPetController) GetPetsByOwner(c *gin.Context) {
 //	@Tags			Pet
 //	@Accept			json
 //	@Produce		json
-//	@Param			pet	body   model.Pet	true	"pet info"
-//	@Success		201		{object}	model.Pet
-//	@Failure		400		{object}	APIError
+//	@Param			pet	body		Pet	true	"pet info"
+//	@Success		201	{object}	model.Pet
+//	@Failure		400	{object}	APIError
 //	@Router			/pets/pet [post]
 func (pc *PremiumPetController) New(c *gin.Context) {
 	pc.ABMController.New(c)
@@ -116,9 +116,9 @@ func (pc *PremiumPetController) New(c *gin.Context) {
 //	@Tags			Pet
 //	@Accept			json
 //	@Produce		json
-//	@Param			id	path   int	true	"id of the pet"
+//	@Param			id		path		int	true	"id of the pet"
 //	@Success		200		{object}	model.Pet
-//	@Failure		400		{object}	APIError
+//	@Failure		400,404	{object}	APIError
 //	@Router			/pets/pet/{id} [get]
 func (pc *PremiumPetController) Get(c *gin.Context) {
 	pc.ABMController.Get(c)
@@ -131,10 +131,10 @@ func (pc *PremiumPetController) Get(c *gin.Context) {
 //	@Tags			Pet
 //	@Accept			json
 //	@Produce		json
-//	@Param			id	path   int	true	"id of the pet"
-//	@Param			pet	body   model.Pet	true	"pet info"
+//	@Param			id		path		int	true	"id of the pet"
+//	@Param			pet		body		Pet	true	"pet info"
 //	@Success		200		{object}	model.Pet
-//	@Failure		400		{object}	APIError
+//	@Failure		400,404	{object}	APIError
 //	@Router			/pets/pet/{id} [put]
 func (pc *PremiumPetController) Edit(c *gin.Context) {
 	pc.ABMController.Edit(c)
@@ -147,9 +147,9 @@ func (pc *PremiumPetController) Edit(c *gin.Context) {
 //	@Tags			Pet
 //	@Accept			json
 //	@Produce		json
-//	@Param			id	path   int	true	"id of the pet"
-//	@Success		204		{object}	nil
-//	@Failure		400		{object}	APIError
+//	@Param			id	path		int	true	"id of the pet"
+//	@Success		204	{object}	nil
+//	@Failure		400	{object}	APIError
 //	@Router			/pets/pet/{id} [delete]
 func (pc *PremiumPetController) Delete(c *gin.Context) {
 	pc.ABMController.Delete(c)

@@ -17,7 +17,8 @@ func NewVaccineService(db db.Storable) VaccineService {
 
 func (vs *VaccineService) New(vaccine model.Vaccine) (model.Vaccine, error) {
 
-	err := vs.db.Save(&vaccine)
+	var object objects.Vaccine
+	err := vs.db.Save(&object)
 	if err != nil {
 		return model.Vaccine{}, err
 	}
@@ -28,7 +29,7 @@ func (vs *VaccineService) New(vaccine model.Vaccine) (model.Vaccine, error) {
 func (vs *VaccineService) Get(id int) (model.Vaccine, error) {
 
 	var object objects.Vaccine
-	err := vs.db.Get(id, object)
+	err := vs.db.Get(id, &object)
 	if err != nil {
 		return model.Vaccine{}, err
 	}

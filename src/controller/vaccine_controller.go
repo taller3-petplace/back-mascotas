@@ -36,7 +36,7 @@ func ValidateVaccine(v model.Vaccine) error {
 //	@Tags			Vaccine
 //	@Accept			json
 //	@Produce		json
-//	@Param			vaccine	body   model.Vaccine	true	"vaccine info"
+//	@Param			vaccine	body		Vaccine	true	"vaccine info"
 //	@Success		201		{object}	model.Vaccine
 //	@Failure		400		{object}	APIError
 //	@Router			/vaccines/vaccine [post]
@@ -51,9 +51,9 @@ func (vs *VaccineController) New(c *gin.Context) {
 //	@Tags			Vaccine
 //	@Accept			json
 //	@Produce		json
-//	@Param			id	path   int	true	"id of the vaccine"
+//	@Param			id		path		int	true	"id of the vaccine"
 //	@Success		200		{object}	model.Vaccine
-//	@Failure		400		{object}	APIError
+//	@Failure		400,404	{object}	APIError
 //	@Router			/vaccines/vaccine/{id} [get]
 func (vs *VaccineController) Get(c *gin.Context) {
 	vs.ABMController.Get(c)
@@ -66,10 +66,10 @@ func (vs *VaccineController) Get(c *gin.Context) {
 //	@Tags			Vaccine
 //	@Accept			json
 //	@Produce		json
-//	@Param			id	path   int	true	"id of the vaccine"
-//	@Param			vaccine	body   model.Vaccine	true	"vaccine info"
+//	@Param			id		path		int		true	"id of the vaccine"
+//	@Param			vaccine	body		Vaccine	true	"vaccine info"
 //	@Success		200		{object}	model.Vaccine
-//	@Failure		400		{object}	APIError
+//	@Failure		400,404	{object}	APIError
 //	@Router			/vaccines/vaccine/{id} [put]
 func (vs *VaccineController) Edit(c *gin.Context) {
 	vs.ABMController.Edit(c)
@@ -82,9 +82,9 @@ func (vs *VaccineController) Edit(c *gin.Context) {
 //	@Tags			Vaccine
 //	@Accept			json
 //	@Produce		json
-//	@Param			id	path   int	true	"id of the vaccine"
-//	@Success		204		{object}	nil
-//	@Failure		400		{object}	APIError
+//	@Param			id	path		int	true	"id of the vaccine"
+//	@Success		204	{object}	nil
+//	@Failure		400	{object}	APIError
 //	@Router			/vaccines/vaccine/{id} [delete]
 func (vs *VaccineController) Delete(c *gin.Context) {
 	vs.ABMController.Delete(c)

@@ -1,6 +1,7 @@
 package model
 
 import (
+	"errors"
 	"strings"
 	"time"
 )
@@ -27,7 +28,7 @@ func (f *Date) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		parsedTime, err = time.Parse(time.RFC3339, dateString)
 		if err != nil {
-			return err
+			return errors.New("error format: must be yyyy-mm-dd")
 		}
 	}
 

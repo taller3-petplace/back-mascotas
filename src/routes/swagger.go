@@ -3,7 +3,7 @@ package routes
 import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"petplace/back-mascotas/src/docs"
+	"petplace/back-mascotas/docs"
 )
 
 func (r *Routes) AddSwaggerRoutes() error {
