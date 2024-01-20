@@ -9,7 +9,7 @@ import (
 func (r *Routes) AddSwaggerRoutes() error {
 
 	docs.SwaggerInfo.Title = "Swagger Pets API"
-	group := r.engine.Group("/swagger")
+	group := r.engine.Group("/pets/swagger")
 	group.GET("/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	return nil
 }
