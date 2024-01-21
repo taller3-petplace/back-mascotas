@@ -45,3 +45,7 @@ func (r *Routes) AddPingRoute() {
 func (r *Routes) ServeRequest(w http.ResponseWriter, req *http.Request) {
 	r.engine.ServeHTTP(w, req)
 }
+
+func (r *Routes) AddMiddleware(f gin.HandlerFunc) {
+	r.engine.Use(f)
+}
