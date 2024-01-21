@@ -15,6 +15,62 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/pets/owner/{owner_id}": {
+            "get": {
+                "description": "Get a pet list given the owner ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pet"
+                ],
+                "summary": "Get pets of owner",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "id of the pet",
+                        "name": "owner_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "offset of the results",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "limit of the results ",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.SearchResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.APIError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/controller.APIError"
+                        }
+                    }
+                }
+            }
+        },
         "/pets/pet": {
             "post": {
                 "description": "Create a pet for a given user",
@@ -429,6 +485,20 @@ const docTemplate = `{
                 "Hamster"
             ]
         },
+        "model.Paging": {
+            "type": "object",
+            "properties": {
+                "limit": {
+                    "type": "integer"
+                },
+                "offset": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
         "model.Pet": {
             "type": "object",
             "properties": {
@@ -449,6 +519,20 @@ const docTemplate = `{
                 },
                 "type": {
                     "$ref": "#/definitions/model.AnimalType"
+                }
+            }
+        },
+        "model.SearchResponse": {
+            "type": "object",
+            "properties": {
+                "paging": {
+                    "$ref": "#/definitions/model.Paging"
+                },
+                "results": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Pet"
+                    }
                 }
             }
         },

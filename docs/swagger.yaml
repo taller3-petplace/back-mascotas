@@ -50,6 +50,15 @@ definitions:
     - Cat
     - Bird
     - Hamster
+  model.Paging:
+    properties:
+      limit:
+        type: integer
+      offset:
+        type: integer
+      total:
+        type: integer
+    type: object
   model.Pet:
     properties:
       birth_date:
@@ -64,6 +73,15 @@ definitions:
         type: string
       type:
         $ref: '#/definitions/model.AnimalType'
+    type: object
+  model.SearchResponse:
+    properties:
+      paging:
+        $ref: '#/definitions/model.Paging'
+      results:
+        items:
+          $ref: '#/definitions/model.Pet'
+        type: array
     type: object
   model.Vaccine:
     properties:
@@ -81,6 +99,43 @@ definitions:
 info:
   contact: {}
 paths:
+  /pets/owner/{owner_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get a pet list given the owner ID
+      parameters:
+      - description: id of the pet
+        in: path
+        name: owner_id
+        required: true
+        type: integer
+      - description: offset of the results
+        in: query
+        name: offset
+        type: integer
+      - description: 'limit of the results '
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SearchResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.APIError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.APIError'
+      summary: Get pets of owner
+      tags:
+      - Pet
   /pets/pet:
     post:
       consumes:
