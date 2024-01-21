@@ -1,11 +1,14 @@
 package model
 
+import "time"
+
 type Vaccine struct {
-	ID          int        `json:"id"`
+	ID          uint       `json:"id"`
 	Animal      AnimalType `json:"animal"`
 	Name        string     `json:"name"`
 	Description string     `json:"description"`
-	Scheduled   uint       `json:"scheduled"`
+	Scheduled   uint       `json:"scheduled,omitempty"`
+	AppliedAt   *time.Time `json:"applied_at,omitempty"`
 }
 
 func (v Vaccine) IsZeroValue() bool {
@@ -19,4 +22,12 @@ func (v Vaccine) IsZeroValue() bool {
 	result = result && (v.Scheduled == zeroValue.Scheduled)
 
 	return result
+}
+
+type VaccinationPlan struct {
+	Name    string
+	Type    string
+	OwnerID int
+	Applied []Vaccine
+	Pending []Vaccine
 }

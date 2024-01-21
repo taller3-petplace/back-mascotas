@@ -54,7 +54,7 @@ func initDB(url string) db.Repository {
 	if err != nil {
 		panic(err)
 	}
-	err = r.Init([]interface{}{objects.Pet{}, objects.Vaccine{}})
+	err = r.Init([]interface{}{objects.Pet{}, objects.Vaccine{}, objects.Application{}})
 	if err != nil {
 		panic(err)
 	}

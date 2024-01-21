@@ -14,6 +14,8 @@ func (r *Routes) AddVaccineRoutes(service services.VaccineService) error {
 	group.GET("/vaccine/:id", c.Get)
 	group.PUT("/vaccine/:id", c.Edit)
 	group.DELETE("/vaccine/:id", c.Delete)
+	group.POST("/apply/:id/to/:pet_id", c.ApplyVaccineToPet)
+	group.GET("/plan/:pet_id", c.GetVaccinationPlan)
 
 	return nil
 

@@ -20,7 +20,7 @@
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "id of the pet",
+                        "description": "owner id to get pets",
                         "name": "owner_id",
                         "in": "path",
                         "required": true
@@ -221,6 +221,108 @@
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/vaccines/apply/{vaccine_id}/to/{pet_id}": {
+            "post": {
+                "description": "Apply vaccine to a given pet",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vaccine"
+                ],
+                "summary": "Apply vaccine",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "vaccine id to apply on pet",
+                        "name": "vaccine_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "pet id of the target pet",
+                        "name": "pet_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.APIError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/controller.APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/vaccines/plan/{pet_id}": {
+            "get": {
+                "description": "Get the vaccination plan of given pet_id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vaccine"
+                ],
+                "summary": "Get vaccination plan",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "pet id to get vaccines",
+                        "name": "pet_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "applied",
+                            "pending"
+                        ],
+                        "type": "string",
+                        "description": "desired formant for the output",
+                        "name": "output",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.VaccinationPlan"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.APIError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/controller.APIError"
                         }
@@ -525,11 +627,40 @@
                 }
             }
         },
+        "model.VaccinationPlan": {
+            "type": "object",
+            "properties": {
+                "applied": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Vaccine"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "ownerID": {
+                    "type": "integer"
+                },
+                "pending": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Vaccine"
+                    }
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
         "model.Vaccine": {
             "type": "object",
             "properties": {
                 "animal": {
                     "$ref": "#/definitions/model.AnimalType"
+                },
+                "applied_at": {
+                    "type": "string"
                 },
                 "description": {
                     "type": "string"

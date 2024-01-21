@@ -83,10 +83,29 @@ definitions:
           $ref: '#/definitions/model.Pet'
         type: array
     type: object
+  model.VaccinationPlan:
+    properties:
+      applied:
+        items:
+          $ref: '#/definitions/model.Vaccine'
+        type: array
+      name:
+        type: string
+      ownerID:
+        type: integer
+      pending:
+        items:
+          $ref: '#/definitions/model.Vaccine'
+        type: array
+      type:
+        type: string
+    type: object
   model.Vaccine:
     properties:
       animal:
         $ref: '#/definitions/model.AnimalType'
+      applied_at:
+        type: string
       description:
         type: string
       id:
@@ -105,7 +124,7 @@ paths:
       - application/json
       description: Get a pet list given the owner ID
       parameters:
-      - description: id of the pet
+      - description: owner id to get pets
         in: path
         name: owner_id
         required: true
@@ -247,6 +266,74 @@ paths:
       summary: Edit a Pet
       tags:
       - Pet
+  /vaccines/apply/{vaccine_id}/to/{pet_id}:
+    post:
+      consumes:
+      - application/json
+      description: Apply vaccine to a given pet
+      parameters:
+      - description: vaccine id to apply on pet
+        in: path
+        name: vaccine_id
+        required: true
+        type: integer
+      - description: pet id of the target pet
+        in: path
+        name: pet_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.APIError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.APIError'
+      summary: Apply vaccine
+      tags:
+      - Vaccine
+  /vaccines/plan/{pet_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get the vaccination plan of given pet_id
+      parameters:
+      - description: pet id to get vaccines
+        in: path
+        name: pet_id
+        required: true
+        type: integer
+      - description: desired formant for the output
+        enum:
+        - applied
+        - pending
+        in: query
+        name: output
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.VaccinationPlan'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.APIError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.APIError'
+      summary: Get vaccination plan
+      tags:
+      - Vaccine
   /vaccines/vaccine:
     post:
       consumes:

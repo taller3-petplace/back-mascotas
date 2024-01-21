@@ -2,6 +2,7 @@ package controller
 
 import (
 	"petplace/back-mascotas/src/model"
+	"time"
 )
 
 // Data transfer types defined for swagger documentation
@@ -19,3 +20,14 @@ type Vaccine struct {
 	Description string           `json:"description" example:"vaccine to preventing rage"`
 	Scheduled   uint             `json:"scheduled" example:"365"`
 }
+
+type Applications struct {
+	PetID    int                   `json:"pet_id"`
+	OwnerID  int                   `json:"owner_id"`
+	PetName  string                `json:"pet_name"`
+	Vaccines map[time.Time]Vaccine `json:"vaccines"`
+}
+
+type OutputFormat string
+
+var formats = []OutputFormat{" asdf", "asdf"}

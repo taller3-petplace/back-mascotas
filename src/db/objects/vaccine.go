@@ -5,7 +5,7 @@ import (
 )
 
 type Vaccine struct {
-	ID          int `gorm:"primaryKey;autoIncrement;unique"`
+	ID          uint `gorm:"primaryKey;autoIncrement;unique"`
 	Animal      string
 	Name        string
 	Description string
@@ -28,5 +28,4 @@ func (v *Vaccine) FromModel(vaccine model.Vaccine) {
 	v.Name = vaccine.Name
 	v.Description = vaccine.Description
 	v.Scheduled = vaccine.Scheduled
-
 }
