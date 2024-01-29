@@ -190,7 +190,7 @@ func (vs *VaccineController) GetVaccinationPlan(c *gin.Context) {
 	plan, err := vs.service.GetPlanVaccination(petID)
 	if err != nil {
 		log.Debugf(logTemplate, vs.name, "APPLYVACCINE", err)
-		ReturnError(c, http.StatusInternalServerError, RegisterError, err.Error())
+		ReturnError(c, http.StatusInternalServerError, ServiceError, err.Error())
 		return
 	}
 	if len(plan.Pending) == 0 && len(plan.Applied) == 0 {

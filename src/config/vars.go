@@ -11,9 +11,10 @@ import (
 const envFile = ".env"
 
 type AppConfig struct {
-	Port     int
-	DbURL    string
-	LogLevel string
+	Port         int
+	DbURL        string
+	TreatmentURL string
+	LogLevel     string
 }
 
 func LoadConfig() (AppConfig, error) {
@@ -40,10 +41,16 @@ func LoadConfig() (AppConfig, error) {
 
 	dbUrl := os.Getenv("DB_URL")
 	if dbUrl == "" {
-		return config, errors.New("missing url")
+		return config, errors.New("missing DB url")
 	}
 
 	config.DbURL = dbUrl
 
+	treatmentUrl := os.Getenv("TREATMENT_URL")
+	if treatmentUrl == "" {
+		return config, errors.New("missing treatment service url")
+
+	}
+	config.TreatmentURL = treatmentUrl
 	return config, nil
 }

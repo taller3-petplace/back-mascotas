@@ -7,6 +7,7 @@ import (
 	"petplace/back-mascotas/src/config"
 	"petplace/back-mascotas/src/db"
 	"petplace/back-mascotas/src/db/objects"
+	"petplace/back-mascotas/src/requester"
 	"petplace/back-mascotas/src/routes"
 	"petplace/back-mascotas/src/services"
 )
@@ -41,9 +42,10 @@ func main() {
 	log.Info("Log level: ", log.GetLevel())
 
 	repository := initDB(appConfig.DbURL)
+	req := initRequester(appConfig.TreatmentURL)
 
 	pp := services.NewPetPlace(&repository)
-	vs := services.NewVaccineService(&repository)
+	vs := services.NewVaccineService(&repository, req)
 
 	r := routes.NewRouter(fmt.Sprintf(":%d", appConfig.Port))
 	r.AddPingRoute()
@@ -77,4 +79,12 @@ func initDB(url string) db.Repository {
 		panic(err)
 	}
 	return r
+}
+
+func initMockRequester(url string) *requester.Requester {
+	return requester.NewRequester(requester.NewMockHttpClient(), url)
+}
+
+func initRequester(url string) *requester.Requester {
+	return requester.NewRequester(requester.NewHttpClient(), url)
 }

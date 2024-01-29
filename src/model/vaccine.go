@@ -31,3 +31,22 @@ type VaccinationPlan struct {
 	Applied []Vaccine
 	Pending []Vaccine
 }
+
+// VaccineResponse response from Treatments service
+type VaccineResponse struct {
+	ID   string    `json:"id"`
+	Name string    `json:"name"`
+	Date time.Time `json:"date"`
+}
+
+func (r VaccineResponse) ToModel() Vaccine {
+
+	return Vaccine{
+		ID:          0,
+		Animal:      "unknown",
+		Name:        r.Name,
+		Description: "unknown",
+		Scheduled:   0,
+		AppliedAt:   &r.Date,
+	}
+}

@@ -6,15 +6,18 @@ import (
 	"petplace/back-mascotas/src/db"
 	"petplace/back-mascotas/src/db/objects"
 	"petplace/back-mascotas/src/model"
+	"petplace/back-mascotas/src/requester"
+	"sort"
 	"time"
 )
 
 type VaccineService struct {
-	db db.Storable
+	db        db.Storable
+	requester *requester.Requester
 }
 
-func NewVaccineService(db db.Storable) VaccineService {
-	return VaccineService{db: db}
+func NewVaccineService(db db.Storable, req *requester.Requester) VaccineService {
+	return VaccineService{db: db, requester: req}
 }
 
 func (vs *VaccineService) New(vaccine model.Vaccine) (model.Vaccine, error) {
@@ -71,22 +74,17 @@ func (vs *VaccineService) ApplyVaccine(petID uint, vaccineID uint) error {
 
 func (vs *VaccineService) GetPlanVaccination(petID int) (model.VaccinationPlan, error) {
 
-	// pegarle a la tabla de mascotas para obtener el tipo
 	var pet objects.Pet
 	err := vs.db.Get(petID, &pet)
 	if err != nil && errors.Is(err, errors.New("not found")) {
 		return model.VaccinationPlan{}, err
 	}
 
-	if pet.ID == 0 || pet.OwnerID == 0 {
+	if pet.ToModel().IsZeroValue() {
 		return model.VaccinationPlan{}, nil
 	}
 
-	// pegarle a la tabla de aplicaciones con el petID
-	var applications []objects.Application
-	_, err = vs.db.GetFiltered(&applications, map[string]string{
-		"pet_id": fmt.Sprintf("%d", petID),
-	}, "applied_at desc", 100, 0)
+	applications, err := vs.requester.GetVaccines(petID)
 	if err != nil {
 		return model.VaccinationPlan{}, err
 	}
@@ -100,7 +98,7 @@ func (vs *VaccineService) GetPlanVaccination(petID int) (model.VaccinationPlan, 
 	return getVaccinationPlan(pet, vaccines, applications), nil
 }
 
-func getVaccinationPlan(pet objects.Pet, vaccines []objects.Vaccine, applications []objects.Application) model.VaccinationPlan {
+func getVaccinationPlan(pet objects.Pet, vaccines []objects.Vaccine, applications []model.Vaccine) model.VaccinationPlan {
 
 	var result model.VaccinationPlan
 	result.Name = pet.Name
@@ -108,13 +106,17 @@ func getVaccinationPlan(pet objects.Pet, vaccines []objects.Vaccine, application
 	result.OwnerID = pet.OwnerID
 
 	for _, app := range applications {
-		tmp := getVaccine(app.VaccineID, vaccines)
-		tmp.AppliedAt = &app.AppliedAt
+		tmp := getVaccine(app.Name, vaccines)
+		tmp.AppliedAt = app.AppliedAt
 		result.Applied = append(result.Applied, tmp)
 	}
 
+	sort.Slice(result.Applied, func(i, j int) bool {
+		return result.Applied[i].AppliedAt.After(*result.Applied[j].AppliedAt)
+	})
+
 	for _, v := range vaccines {
-		if !applied(v, applications) {
+		if !applied(v, result.Applied) {
 			result.Pending = append(result.Pending, v.ToModel())
 		}
 	}
@@ -122,25 +124,25 @@ func getVaccinationPlan(pet objects.Pet, vaccines []objects.Vaccine, application
 	return result
 }
 
-func applied(vaccine objects.Vaccine, apps []objects.Application) bool {
+func applied(vaccine objects.Vaccine, apps []model.Vaccine) bool {
 	for _, app := range apps {
-		if app.VaccineID == vaccine.ID {
+		if app.Name == vaccine.Name {
 			return true
 		}
 	}
 	return false
 }
 
-func getVaccine(id uint, vs []objects.Vaccine) model.Vaccine {
+func getVaccine(name string, vs []objects.Vaccine) model.Vaccine {
 	for _, v := range vs {
-		if v.ID == id {
+		if v.Name == name {
 			return v.ToModel()
 		}
 	}
 	return model.Vaccine{
-		ID:          id,
+		ID:          0,
 		Animal:      "unknown",
-		Name:        "unknown",
+		Name:        name,
 		Description: "unknown",
 		Scheduled:   0,
 	}
