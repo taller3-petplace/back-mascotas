@@ -6,7 +6,6 @@ import (
 	"petplace/back-mascotas/src/db"
 	"petplace/back-mascotas/src/db/objects"
 	"petplace/back-mascotas/src/model"
-	"strconv"
 	"time"
 )
 
@@ -59,7 +58,7 @@ func (pp *PetPlace) GetPetsByOwner(request model.SearchRequest) (model.SearchRes
 
 	var objects []objects.Pet
 	total, err := pp.db.GetFiltered(&objects, map[string]string{
-		"owner_id": strconv.Itoa(request.OwnerId),
+		"owner_id": request.OwnerId,
 	}, "Name ASC", int(request.Limit), int(request.Offset))
 
 	if err != nil {
@@ -83,6 +82,8 @@ func (pp *PetPlace) GetPetsByOwner(request model.SearchRequest) (model.SearchRes
 }
 
 func (pp *PetPlace) Edit(petID int, pet model.Pet) (model.Pet, error) {
+
+	pet.ID = petID
 
 	var object objects.Pet
 	object.FromModel(pet)

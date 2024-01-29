@@ -15,8 +15,8 @@ definitions:
         example: Raaida
         type: string
       owner_id:
-        example: 1
-        type: integer
+        example: aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee
+        type: string
       type:
         allOf:
         - $ref: '#/definitions/model.AnimalType'
@@ -65,10 +65,12 @@ definitions:
         type: string
       id:
         type: integer
+      img_url:
+        type: string
       name:
         type: string
       owner_id:
-        type: integer
+        type: string
       register_date:
         type: string
       type:
@@ -92,7 +94,7 @@ definitions:
       name:
         type: string
       ownerID:
-        type: integer
+        type: string
       pending:
         items:
           $ref: '#/definitions/model.Vaccine'
@@ -128,7 +130,7 @@ paths:
         in: path
         name: owner_id
         required: true
-        type: integer
+        type: string
       - description: offset of the results
         in: query
         name: offset

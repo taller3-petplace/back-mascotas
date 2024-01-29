@@ -100,22 +100,17 @@ func (pc *PremiumPetController) Delete(c *gin.Context) {
 //	@Tags			Pet
 //	@Accept			json
 //	@Produce		json
-//	@Param			owner_id	path		int	true	"owner id to get pets"
-//	@Param			offset		query		int	false	"offset of the results"
-//	@Param			limit		query		int	false	"limit of the results "
+//	@Param			owner_id	path		string	true	"owner id to get pets"
+//	@Param			offset		query		int		false	"offset of the results"
+//	@Param			limit		query		int		false	"limit of the results "
 //	@Success		200			{object}	model.SearchResponse
 //	@Failure		400,404		{object}	APIError
 //	@Router			/pets/owner/{owner_id} [get]
 func (pc *PremiumPetController) GetPetsByOwner(c *gin.Context) {
 
-	ownerIDStr, ok := c.Params.Get("owner_id")
-	if !ok || ownerIDStr == "" {
+	ownerID, ok := c.Params.Get("owner_id")
+	if !ok || ownerID == "" {
 		ReturnError(c, http.StatusBadRequest, MissingParams, "expected owner_id")
-		return
-	}
-	ownerID, err := strconv.Atoi(ownerIDStr)
-	if err != nil {
-		ReturnError(c, http.StatusBadRequest, MissingParams, "cannot parse owner_id: "+err.Error())
 		return
 	}
 

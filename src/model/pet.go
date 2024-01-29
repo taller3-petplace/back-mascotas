@@ -10,7 +10,8 @@ type Pet struct {
 	Type         AnimalType `json:"type"`
 	RegisterDate time.Time  `json:"register_date"`
 	BirthDate    Date       `json:"birth_date" swaggertype:"string"`
-	OwnerID      int        `json:"owner_id"`
+	OwnerID      string     `json:"owner_id"`
+	IMGUrl       string     `json:"img_url"`
 }
 
 func (p Pet) IsZeroValue() bool {
@@ -23,6 +24,7 @@ func (p Pet) IsZeroValue() bool {
 	result = result && (p.RegisterDate == zeroValue.RegisterDate)
 	result = result && (p.BirthDate == zeroValue.BirthDate)
 	result = result && (p.OwnerID == zeroValue.OwnerID)
+	result = result && (p.IMGUrl == zeroValue.IMGUrl)
 
 	return result
 }

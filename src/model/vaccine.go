@@ -20,6 +20,7 @@ func (v Vaccine) IsZeroValue() bool {
 	result = result && (v.Animal == zeroValue.Animal)
 	result = result && (v.Description == zeroValue.Description)
 	result = result && (v.Scheduled == zeroValue.Scheduled)
+	result = result && (v.AppliedAt == zeroValue.AppliedAt)
 
 	return result
 }
@@ -27,7 +28,7 @@ func (v Vaccine) IsZeroValue() bool {
 type VaccinationPlan struct {
 	Name    string
 	Type    string
-	OwnerID int
+	OwnerID string
 	Applied []Vaccine
 	Pending []Vaccine
 }

@@ -14,7 +14,8 @@ type Pet struct {
 	UpdatedAt time.Time      `gorm:"type:timestamptz"`
 	BirthDate time.Time      `gorm:"type:date"`
 	DeletedAt gorm.DeletedAt `gorm:"type:timestamptz"`
-	OwnerID   int
+	OwnerID   string
+	IMGUrl    string
 }
 
 func (p *Pet) FromModel(pet model.Pet) {
@@ -24,6 +25,7 @@ func (p *Pet) FromModel(pet model.Pet) {
 	p.CreatedAt = pet.RegisterDate
 	p.BirthDate = pet.BirthDate.Time
 	p.OwnerID = pet.OwnerID
+	p.IMGUrl = pet.IMGUrl
 }
 
 func (p *Pet) ToModel() model.Pet {
@@ -35,5 +37,6 @@ func (p *Pet) ToModel() model.Pet {
 	pet.RegisterDate = p.CreatedAt
 	pet.BirthDate = model.Date{Time: p.BirthDate}
 	pet.OwnerID = p.OwnerID
+	pet.IMGUrl = p.IMGUrl
 	return pet
 }

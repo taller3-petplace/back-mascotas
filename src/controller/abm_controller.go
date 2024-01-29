@@ -95,7 +95,7 @@ func (abm *ABMController[Entity]) Get(c *gin.Context) {
 
 func (abm *ABMController[Entity]) Edit(c *gin.Context) {
 
-	log.Debugf(logTemplate, abm.name, "NEW", fmt.Sprintf("new request | body: %s", getBody(c)))
+	log.Debugf(logTemplate, abm.name, "EDIT", fmt.Sprintf("edit request | body: %s", getBody(c)))
 
 	idStr, ok := c.Params.Get(IDParamName)
 	if !ok || idStr == "" {
@@ -145,7 +145,7 @@ func (abm *ABMController[Entity]) Edit(c *gin.Context) {
 	}
 
 	log.Debugf(logTemplate, abm.name, "NEW", fmt.Sprintf("success | response: %v", e))
-	c.JSON(http.StatusCreated, e)
+	c.JSON(http.StatusOK, e)
 
 }
 

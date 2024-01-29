@@ -11,7 +11,7 @@ type Pet struct {
 	Name      string           `json:"name" example:"Raaida"`
 	Type      model.AnimalType `json:"type" example:"dog"`
 	BirthDate string           `json:"birth_date" example:"2013-05-23"`
-	OwnerID   int              `json:"owner_id" example:"1"`
+	OwnerID   string           `json:"owner_id" example:"aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"`
 }
 
 type Vaccine struct {
@@ -23,7 +23,7 @@ type Vaccine struct {
 
 type Applications struct {
 	PetID    int                   `json:"pet_id"`
-	OwnerID  int                   `json:"owner_id"`
+	OwnerID  string                `json:"owner_id"`
 	PetName  string                `json:"pet_name"`
 	Vaccines map[time.Time]Vaccine `json:"vaccines"`
 }

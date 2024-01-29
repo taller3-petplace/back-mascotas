@@ -30,7 +30,7 @@ const docTemplate = `{
                 "summary": "Get pets of owner",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "owner id to get pets",
                         "name": "owner_id",
                         "in": "path",
@@ -486,8 +486,8 @@ const docTemplate = `{
                     "example": "Raaida"
                 },
                 "owner_id": {
-                    "type": "integer",
-                    "example": 1
+                    "type": "string",
+                    "example": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
                 },
                 "type": {
                     "allOf": [
@@ -562,11 +562,14 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "img_url": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 },
                 "owner_id": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "register_date": {
                     "type": "string"
@@ -603,7 +606,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "ownerID": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "pending": {
                     "type": "array",

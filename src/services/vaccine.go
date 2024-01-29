@@ -44,6 +44,8 @@ func (vs *VaccineService) Get(id int) (model.Vaccine, error) {
 }
 
 func (vs *VaccineService) Edit(id int, vaccine model.Vaccine) (model.Vaccine, error) {
+
+	vaccine.ID = uint(id)
 	var object objects.Vaccine
 	object.FromModel(vaccine)
 	err := vs.db.Save(&object)
