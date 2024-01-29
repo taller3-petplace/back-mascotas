@@ -266,38 +266,6 @@ paths:
       summary: Edit a Pet
       tags:
       - Pet
-  /vaccines/apply/{vaccine_id}/to/{pet_id}:
-    post:
-      consumes:
-      - application/json
-      description: Apply vaccine to a given pet
-      parameters:
-      - description: vaccine id to apply on pet
-        in: path
-        name: vaccine_id
-        required: true
-        type: integer
-      - description: pet id of the target pet
-        in: path
-        name: pet_id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/controller.APIError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/controller.APIError'
-      summary: Apply vaccine
-      tags:
-      - Vaccine
   /vaccines/plan/{pet_id}:
     get:
       consumes:

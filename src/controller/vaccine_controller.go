@@ -99,6 +99,9 @@ func (vs *VaccineController) Delete(c *gin.Context) {
 	vs.ABMController.Delete(c)
 }
 
+/*
+// Temporary deprecated method
+
 // ApplyVaccineToPet godoc
 //
 //	@Summary		Apply vaccine
@@ -113,46 +116,51 @@ func (vs *VaccineController) Delete(c *gin.Context) {
 //	@Router			/vaccines/apply/{vaccine_id}/to/{pet_id} [post]
 func (vs *VaccineController) ApplyVaccineToPet(c *gin.Context) {
 
-	vaccineIDStr, ok := c.Params.Get("id")
-	if !ok || vaccineIDStr == "" {
-		ReturnError(c, http.StatusBadRequest, MissingParams, "expected vaccine_id")
-		return
-	}
-	vaccineID, err := strconv.Atoi(vaccineIDStr)
-	if err != nil {
-		ReturnError(c, http.StatusBadRequest, MissingParams, "cannot parse vaccine_id: "+err.Error())
-		return
-	}
+		vaccineIDStr, ok := c.Params.Get("id")
+		if !ok || vaccineIDStr == "" {
+			ReturnError(c, http.StatusBadRequest, MissingParams, "expected vaccine_id")
+			return
+		}
+		vaccineID, err := strconv.Atoi(vaccineIDStr)
+		if err != nil {
+			ReturnError(c, http.StatusBadRequest, MissingParams, "cannot parse vaccine_id: "+err.Error())
+			return
+		}
 
-	petIDStr, ok := c.Params.Get("pet_id")
-	if !ok || petIDStr == "" {
-		ReturnError(c, http.StatusBadRequest, MissingParams, "expected pet_id")
-		return
-	}
-	petID, err := strconv.Atoi(petIDStr)
-	if err != nil {
-		ReturnError(c, http.StatusBadRequest, MissingParams, "cannot parse pet_id: "+err.Error())
-		return
-	}
+		petIDStr, ok := c.Params.Get("pet_id")
+		if !ok || petIDStr == "" {
+			ReturnError(c, http.StatusBadRequest, MissingParams, "expected pet_id")
+			return
+		}
+		petID, err := strconv.Atoi(petIDStr)
+		if err != nil {
+			ReturnError(c, http.StatusBadRequest, MissingParams, "cannot parse pet_id: "+err.Error())
+			return
+		}
 
-	err = vs.service.ApplyVaccine(uint(petID), uint(vaccineID))
-	if err != nil {
-		log.Debugf(logTemplate, vs.name, "APPLYVACCINE", err)
-		ReturnError(c, http.StatusInternalServerError, RegisterError, err.Error())
-		return
+		err = vs.service.ApplyVaccine(uint(petID), uint(vaccineID))
+		if err != nil {
+			log.Debugf(logTemplate, vs.name, "APPLYVACCINE", err)
+			ReturnError(c, http.StatusInternalServerError, RegisterError, err.Error())
+			return
+		}
+
+		log.Debugf(logTemplate, vs.name, "APPLYVACCINE", "success")
+
+		response := struct {
+			PetId     int `json:"pet_id"`
+			VaccineId int `json:"vaccine_id"`
+		}{
+			PetId:     petID,
+			VaccineId: vaccineID,
+		}
+
+		c.JSON(http.StatusCreated, response)
 	}
+*/
 
-	log.Debugf(logTemplate, vs.name, "APPLYVACCINE", "success")
-
-	response := struct {
-		PetId     int `json:"pet_id"`
-		VaccineId int `json:"vaccine_id"`
-	}{
-		PetId:     petID,
-		VaccineId: vaccineID,
-	}
-
-	c.JSON(http.StatusCreated, response)
+func (vs *VaccineController) ApplyVaccineToPet(c *gin.Context) {
+	c.JSON(http.StatusNotFound, nil)
 }
 
 // GetVaccinationPlan godoc
