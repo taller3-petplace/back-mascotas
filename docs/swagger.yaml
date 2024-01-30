@@ -6,6 +6,27 @@ definitions:
       status:
         type: integer
     type: object
+  controller.Doctor:
+    properties:
+      email:
+        example: JuanValdez@gmail.com
+        type: string
+      name:
+        example: Juan Valdez
+        type: string
+      phone:
+        example: "123456789"
+        type: string
+    type: object
+  controller.Location:
+    properties:
+      latitude:
+        example: -34.603684
+        type: number
+      longitude:
+        example: -58.381559
+        type: number
+    type: object
   controller.Pet:
     properties:
       birth_date:
@@ -38,6 +59,39 @@ definitions:
         example: 365
         type: integer
     type: object
+  controller.Veterinary:
+    properties:
+      address:
+        example: Av. Siempreviva 123
+        type: string
+      city_id:
+        example: Buenos Aires
+        type: string
+      day_guard:
+        example: 1
+        type: integer
+      doctors:
+        items:
+          $ref: '#/definitions/controller.Doctor'
+        type: array
+      email:
+        example: veterinary1@gmail.com
+        type: string
+      img_url:
+        example: www.veterinary1.com/img.png
+        type: string
+      location:
+        $ref: '#/definitions/controller.Location'
+      name:
+        example: Veterinary 1
+        type: string
+      phone:
+        example: "123456789"
+        type: string
+      web_site:
+        example: www.veterinary1.com
+        type: string
+    type: object
   model.AnimalType:
     enum:
     - dog
@@ -50,6 +104,24 @@ definitions:
     - Cat
     - Bird
     - Hamster
+  model.Doctor:
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      phone:
+        type: string
+    type: object
+  model.Location:
+    properties:
+      latitude:
+        type: number
+      longitude:
+        type: number
+    type: object
   model.Paging:
     properties:
       limit:
@@ -116,6 +188,33 @@ definitions:
         type: string
       scheduled:
         type: integer
+    type: object
+  model.Veterinary:
+    properties:
+      address:
+        type: string
+      city_id:
+        type: string
+      day_guard:
+        type: integer
+      doctors:
+        items:
+          $ref: '#/definitions/model.Doctor'
+        type: array
+      email:
+        type: string
+      id:
+        type: integer
+      img_url:
+        type: string
+      location:
+        $ref: '#/definitions/model.Location'
+      name:
+        type: string
+      phone:
+        type: string
+      web_site:
+        type: string
     type: object
 info:
   contact: {}
@@ -415,4 +514,115 @@ paths:
       summary: Edit a Vaccine
       tags:
       - Vaccine
+  /veterinaries/veterinary:
+    post:
+      consumes:
+      - application/json
+      description: Create a Veterinary
+      parameters:
+      - description: Veterinary info
+        in: body
+        name: veterinary
+        required: true
+        schema:
+          $ref: '#/definitions/controller.Veterinary'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Veterinary'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.APIError'
+      summary: Creates a Veterinary
+      tags:
+      - Veterinary
+  /veterinaries/veterinary/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a Veterinary given a veterinary ID
+      parameters:
+      - description: id of the veterinary
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.APIError'
+      summary: Delete a Veterinary
+      tags:
+      - Veterinary
+    get:
+      consumes:
+      - application/json
+      description: Get veterinary info given a veterinary ID
+      parameters:
+      - description: id of the veterinary
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Veterinary'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.APIError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.APIError'
+      summary: Get a veterinary
+      tags:
+      - Veterinary
+    put:
+      consumes:
+      - application/json
+      description: Edit Veterinary info given a veterinary ID
+      parameters:
+      - description: id of the Veterinary
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Veterinary info
+        in: body
+        name: veterinary
+        required: true
+        schema:
+          $ref: '#/definitions/controller.Veterinary'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Veterinary'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.APIError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.APIError'
+      summary: Edit a Veterinary
+      tags:
+      - Veterinary
 swagger: "2.0"

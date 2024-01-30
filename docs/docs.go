@@ -460,6 +460,174 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/veterinaries/veterinary": {
+            "post": {
+                "description": "Create a Veterinary",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Veterinary"
+                ],
+                "summary": "Creates a Veterinary",
+                "parameters": [
+                    {
+                        "description": "Veterinary info",
+                        "name": "veterinary",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.Veterinary"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/model.Veterinary"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/veterinaries/veterinary/{id}": {
+            "get": {
+                "description": "Get veterinary info given a veterinary ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Veterinary"
+                ],
+                "summary": "Get a veterinary",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "id of the veterinary",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Veterinary"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.APIError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/controller.APIError"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Edit Veterinary info given a veterinary ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Veterinary"
+                ],
+                "summary": "Edit a Veterinary",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "id of the Veterinary",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Veterinary info",
+                        "name": "veterinary",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.Veterinary"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Veterinary"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.APIError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/controller.APIError"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a Veterinary given a veterinary ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Veterinary"
+                ],
+                "summary": "Delete a Veterinary",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "id of the veterinary",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.APIError"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -471,6 +639,36 @@ const docTemplate = `{
                 },
                 "status": {
                     "type": "integer"
+                }
+            }
+        },
+        "controller.Doctor": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "JuanValdez@gmail.com"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Juan Valdez"
+                },
+                "phone": {
+                    "type": "string",
+                    "example": "123456789"
+                }
+            }
+        },
+        "controller.Location": {
+            "type": "object",
+            "properties": {
+                "latitude": {
+                    "type": "number",
+                    "example": -34.603684
+                },
+                "longitude": {
+                    "type": "number",
+                    "example": -58.381559
                 }
             }
         },
@@ -524,6 +722,52 @@ const docTemplate = `{
                 }
             }
         },
+        "controller.Veterinary": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string",
+                    "example": "Av. Siempreviva 123"
+                },
+                "city_id": {
+                    "type": "string",
+                    "example": "Buenos Aires"
+                },
+                "day_guard": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "doctors": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/controller.Doctor"
+                    }
+                },
+                "email": {
+                    "type": "string",
+                    "example": "veterinary1@gmail.com"
+                },
+                "img_url": {
+                    "type": "string",
+                    "example": "www.veterinary1.com/img.png"
+                },
+                "location": {
+                    "$ref": "#/definitions/controller.Location"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Veterinary 1"
+                },
+                "phone": {
+                    "type": "string",
+                    "example": "123456789"
+                },
+                "web_site": {
+                    "type": "string",
+                    "example": "www.veterinary1.com"
+                }
+            }
+        },
         "model.AnimalType": {
             "type": "string",
             "enum": [
@@ -538,6 +782,34 @@ const docTemplate = `{
                 "Bird",
                 "Hamster"
             ]
+        },
+        "model.Doctor": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Location": {
+            "type": "object",
+            "properties": {
+                "latitude": {
+                    "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                }
+            }
         },
         "model.Paging": {
             "type": "object",
@@ -639,6 +911,47 @@ const docTemplate = `{
                 },
                 "scheduled": {
                     "type": "integer"
+                }
+            }
+        },
+        "model.Veterinary": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "city_id": {
+                    "type": "string"
+                },
+                "day_guard": {
+                    "type": "integer"
+                },
+                "doctors": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Doctor"
+                    }
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "img_url": {
+                    "type": "string"
+                },
+                "location": {
+                    "$ref": "#/definitions/model.Location"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "web_site": {
+                    "type": "string"
                 }
             }
         }

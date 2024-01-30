@@ -46,6 +46,7 @@ func main() {
 
 	pp := services.NewPetPlace(&repository)
 	vs := services.NewVaccineService(&repository, req)
+	vet := services.NewVeterinaryService(&repository)
 
 	r := routes.NewRouter(fmt.Sprintf(":%d", appConfig.Port))
 	r.AddPingRoute()
@@ -56,6 +57,11 @@ func main() {
 	}
 
 	err = r.AddVaccineRoutes(vs)
+	if err != nil {
+		panic(err)
+	}
+
+	err = r.AddVeterinaryRoutes(vet)
 	if err != nil {
 		panic(err)
 	}
@@ -74,7 +80,7 @@ func initDB(url string) db.Repository {
 	if err != nil {
 		panic(err)
 	}
-	err = r.Init([]interface{}{objects.Pet{}, objects.Vaccine{}, objects.Application{}})
+	err = r.Init([]interface{}{objects.Pet{}, objects.Vaccine{}, objects.Application{}, objects.Veterinary{}})
 	if err != nil {
 		panic(err)
 	}

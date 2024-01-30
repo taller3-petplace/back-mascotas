@@ -31,3 +31,27 @@ type Applications struct {
 type OutputFormat string
 
 var formats = []OutputFormat{" asdf", "asdf"}
+
+type Veterinary struct {
+	Name     string   `json:"name" example:"Veterinary 1"`
+	Address  string   `json:"address" example:"Av. Siempreviva 123"`
+	Phone    string   `json:"phone" example:"123456789"`
+	Email    string   `json:"email" example:"veterinary1@gmail.com"`
+	WebSite  string   `json:"web_site" example:"www.veterinary1.com"`
+	IMGUrl   string   `json:"img_url" example:"www.veterinary1.com/img.png"`
+	City     string   `json:"city_id" example:"Buenos Aires"`
+	Location Location `json:"location"`
+	Doctors  []Doctor `json:"doctors"`
+	DayGuard int      `json:"day_guard" example:"1"`
+}
+
+type Location struct {
+	Latitude  float64 `json:"latitude" example:"-34.603684"`
+	Longitude float64 `json:"longitude" example:"-58.381559"`
+}
+
+type Doctor struct {
+	Name  string `json:"name" example:"Juan Valdez"`
+	Phone string `json:"phone" example:"123456789"`
+	Email string `json:"email" example:"JuanValdez@gmail.com"`
+}
