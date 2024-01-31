@@ -2,13 +2,14 @@ package routes
 
 import (
 	"petplace/back-mascotas/src/controller"
+	"petplace/back-mascotas/src/routes/internal"
 	"petplace/back-mascotas/src/services"
 )
 
 func (r *Routes) AddVaccineRoutes(service services.VaccineService) error {
 	c := controller.NewVaccineController(service)
 
-	group := r.engine.Group("/vaccines")
+	group := r.engine.Group("/vaccines", internal.AppContextCreator())
 
 	group.POST("/vaccine", c.New)
 	group.GET("/vaccine/:id", c.Get)
