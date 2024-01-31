@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"petplace/back-mascotas/src/model"
+	"petplace/back-mascotas/src/requester/domain"
 	"time"
 )
 
@@ -27,7 +27,7 @@ func NewHttpClient() HttpClient {
 
 func (m *MockHttpClient) Do(_ *http.Request) (*http.Response, error) {
 
-	validBody := []model.VaccineResponse{
+	validBody := []domain.VaccineResponse{
 		{
 			ID:   "1",
 			Name: "vacuna 1",

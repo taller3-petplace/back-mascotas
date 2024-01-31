@@ -6,19 +6,8 @@ import (
 	"io"
 	"net/http"
 	"petplace/back-mascotas/src/model"
+	"petplace/back-mascotas/src/requester/domain"
 )
-
-type Requester struct {
-	clientHTTP HttpClient
-	baseUrl    string
-}
-
-func NewRequester(client HttpClient, url string) *Requester {
-	var requester Requester
-	requester.clientHTTP = client
-	requester.baseUrl = url
-	return &requester
-}
 
 // GetVaccines fetches all the vaccines that were applied to the pet
 func (r *Requester) GetVaccines(petID int) ([]model.Vaccine, error) {
@@ -56,7 +45,7 @@ func (r *Requester) GetVaccines(petID int) ([]model.Vaccine, error) {
 		return nil, fmt.Errorf("error reading vaccines body: %w", err)
 	}
 
-	var vaccinesResponse []model.VaccineResponse
+	var vaccinesResponse []domain.VaccineResponse
 	err = json.Unmarshal(responseBody, &vaccinesResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling vaccines response: %v", err)

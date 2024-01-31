@@ -32,7 +32,7 @@ func NewABMController[T Entity](service services.ABMService[T]) ABMController[T]
 
 func (abm *ABMController[Entity]) New(c *gin.Context) {
 
-	log.Debugf(logTemplate, abm.name, "NEW", fmt.Sprintf("new request | body: %v", getBody(c)))
+	log.Debugf(logTemplate, abm.name, "NEW", fmt.Sprintf("new request | body: %v", getBodyString(c)))
 
 	var e Entity
 	err := c.BindJSON(&e)
@@ -95,7 +95,7 @@ func (abm *ABMController[Entity]) Get(c *gin.Context) {
 
 func (abm *ABMController[Entity]) Edit(c *gin.Context) {
 
-	log.Debugf(logTemplate, abm.name, "EDIT", fmt.Sprintf("edit request | body: %s", getBody(c)))
+	log.Debugf(logTemplate, abm.name, "EDIT", fmt.Sprintf("edit request | body: %s", getBodyString(c)))
 
 	idStr, ok := c.Params.Get(IDParamName)
 	if !ok || idStr == "" {
@@ -170,16 +170,29 @@ func (abm *ABMController[Entity]) Delete(c *gin.Context) {
 	c.JSON(http.StatusNoContent, nil)
 }
 
-func getBody(c *gin.Context) string {
+func getBodyString(c *gin.Context) string {
 
-	// Crea un buffer para almacenar el cuerpo de la solicitud
+	bodyBytes, err := getBody(c)
+	if err != nil {
+		return ""
+	}
+	reWriteBody(c, bodyBytes)
+	return strings.ReplaceAll(string(bodyBytes), "\n", "")
+}
+
+func reWriteBody(c *gin.Context, body []byte) {
+	c.Request.Body = io.NopCloser(bytes.NewBuffer(body))
+}
+
+func getBody(c *gin.Context) ([]byte, error) {
+
 	var requestBodyBuffer bytes.Buffer
 
 	teeReader := io.TeeReader(c.Request.Body, &requestBodyBuffer)
 	bodyBytes, err := io.ReadAll(teeReader)
 	if err != nil {
-		return "[error reading body]"
+		return nil, err
 	}
-	c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
-	return strings.ReplaceAll(string(bodyBytes), "\n", "")
+
+	return bodyBytes, nil
 }

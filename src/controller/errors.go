@@ -22,8 +22,8 @@ type APIError struct {
 	Message string `json:"message"`
 }
 
-func NewApiError(err error, status int) APIError {
-	return APIError{
+func NewApiError(err error, status int) *APIError {
+	return &APIError{
 		error:   err,
 		Status:  status,
 		Message: err.Error(),

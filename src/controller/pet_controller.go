@@ -1,10 +1,12 @@
 package controller
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"petplace/back-mascotas/src/model"
+	"petplace/back-mascotas/src/requester"
 	"petplace/back-mascotas/src/services"
 	"strconv"
 )
@@ -12,15 +14,17 @@ import (
 type PremiumPetController struct {
 	ABMController[model.Pet]
 	service services.PetService
+	users   *requester.Requester
 }
 
-func NewPetController(service services.PetService) PremiumPetController {
+func NewPetController(service services.PetService, usersService *requester.Requester) PremiumPetController {
 
 	temp := PremiumPetController{}
 	temp.service = service
 	temp.s = service
 	temp.Validate = ValidateNewAnimal
 	temp.name = "PET"
+	temp.users = usersService
 	return temp
 }
 
@@ -44,6 +48,16 @@ func ValidateNewAnimal(pet model.Pet) error {
 //	@Failure		400	{object}	APIError
 //	@Router			/pets/pet [post]
 func (pc *PremiumPetController) New(c *gin.Context) {
+
+	telegramIDStr := c.Request.Header.Get("X-Telegram-Id")
+	if telegramIDStr != "" {
+		apiErr := pc.handleTelegramID(c, telegramIDStr)
+		if apiErr != nil {
+			ReturnError(c, http.StatusBadRequest, apiErr.error, apiErr.Message)
+			return
+		}
+	}
+
 	pc.ABMController.New(c)
 }
 
@@ -75,6 +89,16 @@ func (pc *PremiumPetController) Get(c *gin.Context) {
 //	@Failure		400,404	{object}	APIError
 //	@Router			/pets/pet/{id} [put]
 func (pc *PremiumPetController) Edit(c *gin.Context) {
+
+	telegramIDStr := c.Request.Header.Get("X-Telegram-Id")
+	if telegramIDStr != "" {
+		apiErr := pc.handleTelegramID(c, telegramIDStr)
+		if apiErr != nil {
+			ReturnError(c, http.StatusBadRequest, apiErr.error, apiErr.Message)
+			return
+		}
+	}
+
 	pc.ABMController.Edit(c)
 }
 
@@ -114,6 +138,28 @@ func (pc *PremiumPetController) GetPetsByOwner(c *gin.Context) {
 		return
 	}
 
+	telegramIDStr := c.Request.Header.Get("X-Telegram-Id")
+	if telegramIDStr != "" {
+
+		if ownerID != telegramIDStr {
+			ReturnError(c, http.StatusBadRequest, MissingParams, "mismatch between owner_id and X-Telegram-Id")
+			return
+		}
+
+		telegramID, err := strconv.Atoi(telegramIDStr)
+		if err != nil {
+			ReturnError(c, http.StatusBadRequest, MissingParams, "cannot parse owner_id: "+err.Error())
+			return
+		}
+
+		user, err := pc.users.GetUserData(telegramID)
+		if err != nil {
+			ReturnError(c, http.StatusBadRequest, MissingParams, "expected owner_id")
+			return
+		}
+		ownerID = user.ID
+	}
+
 	searchRequest := model.NewSearchRequest()
 	offsetStr := c.Query("offset")
 	if offsetStr != "" {
@@ -143,10 +189,56 @@ func (pc *PremiumPetController) GetPetsByOwner(c *gin.Context) {
 	}
 
 	if len(response.Results) == 0 {
-		ReturnError(c, http.StatusNotFound, EntityNotFound, fmt.Sprintf("not found pets for owner: '%d' ", ownerID))
+		ReturnError(c, http.StatusNotFound, EntityNotFound, fmt.Sprintf("not found pets for owner: '%v' ", ownerID))
 		return
 	}
 
 	c.JSON(http.StatusOK, response)
 
+}
+
+func (pc *PremiumPetController) handleTelegramID(c *gin.Context, telegramIDStr string) *APIError {
+
+	// Parse the telegram ID to int
+	telegramID, err := strconv.Atoi(telegramIDStr)
+	if err != nil {
+		return NewApiError(fmt.Errorf("asdasdf"), http.StatusBadRequest)
+	}
+
+	// Get the user data
+	user, err := pc.users.GetUserData(telegramID)
+	if err != nil {
+		return NewApiError(fmt.Errorf("asdasdf"), http.StatusBadRequest)
+	}
+
+	// Set the owner ID in the request body
+	err = setOwnerIDRequest(c, user.ID)
+	if err != nil {
+		return NewApiError(fmt.Errorf("asdasdf"), http.StatusBadRequest)
+	}
+
+	return nil
+}
+
+func setOwnerIDRequest(ctx *gin.Context, ownerID string) error {
+
+	var pet model.Pet
+	body, err := getBody(ctx)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(body, &pet)
+	if err != nil {
+		return err
+	}
+	pet.OwnerID = ownerID
+
+	rawPet, err := json.Marshal(pet)
+	if err != nil {
+		return err
+	}
+	reWriteBody(ctx, rawPet)
+
+	return nil
 }

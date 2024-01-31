@@ -14,6 +14,7 @@ type AppConfig struct {
 	Port         int
 	DbURL        string
 	TreatmentURL string
+	UsersURL     string
 	LogLevel     string
 }
 
@@ -24,7 +25,7 @@ func LoadConfig() (AppConfig, error) {
 		log.Print("error cargando el archivo: ", err)
 	}
 
-	loglevel := os.Getenv("LOG")
+	loglevel := os.Getenv("LOG_LEVEL")
 	if loglevel == "" {
 		config.LogLevel = "INFO"
 	} else {
@@ -44,13 +45,19 @@ func LoadConfig() (AppConfig, error) {
 		return config, errors.New("missing DB url")
 	}
 
-	config.DbURL = dbUrl
-
-	treatmentUrl := os.Getenv("TREATMENT_URL")
+	treatmentUrl := os.Getenv("TREATMENTS_URL")
 	if treatmentUrl == "" {
 		return config, errors.New("missing treatment service url")
-
 	}
+
+	usersUrl := os.Getenv("USERS_URL")
+	if usersUrl == "" {
+		return config, errors.New("missing users service url")
+	}
+
+	config.DbURL = dbUrl
 	config.TreatmentURL = treatmentUrl
+	config.UsersURL = usersUrl
+
 	return config, nil
 }

@@ -42,16 +42,17 @@ func main() {
 	log.Info("Log level: ", log.GetLevel())
 
 	repository := initDB(appConfig.DbURL)
-	req := initRequester(appConfig.TreatmentURL)
+	vaccinesService := initRequester(appConfig.TreatmentURL)
+	usersService := initRequester(appConfig.UsersURL)
 
 	pp := services.NewPetPlace(&repository)
-	vs := services.NewVaccineService(&repository, req)
+	vs := services.NewVaccineService(&repository, vaccinesService)
 	vet := services.NewVeterinaryService(&repository)
 
 	r := routes.NewRouter(fmt.Sprintf(":%d", appConfig.Port))
 	r.AddPingRoute()
 	r.AddMiddleware(CORSMiddleware())
-	err = r.AddPetRoutes(&pp)
+	err = r.AddPetRoutes(&pp, usersService)
 	if err != nil {
 		panic(err)
 	}
