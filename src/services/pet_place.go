@@ -14,7 +14,7 @@ type PetService interface {
 	Get(petID int) (model.Pet, error)
 	Edit(petID int, pet model.Pet) (model.Pet, error)
 	Delete(petID int)
-	GetPetsByOwner(request model.SearchRequest) (model.SearchResponse, error)
+	GetPetsByOwner(request model.SearchRequest) (model.SearchResponse[model.Pet], error)
 }
 
 const tableName = "pets"
@@ -54,7 +54,7 @@ func (pp *PetPlace) Get(petID int) (model.Pet, error) {
 	return object.ToModel(), nil
 }
 
-func (pp *PetPlace) GetPetsByOwner(request model.SearchRequest) (model.SearchResponse, error) {
+func (pp *PetPlace) GetPetsByOwner(request model.SearchRequest) (model.SearchResponse[model.Pet], error) {
 
 	var objects []objects.Pet
 	total, err := pp.db.GetFiltered(&objects, map[string]string{
@@ -62,10 +62,10 @@ func (pp *PetPlace) GetPetsByOwner(request model.SearchRequest) (model.SearchRes
 	}, "Name ASC", int(request.Limit), int(request.Offset))
 
 	if err != nil {
-		return model.SearchResponse{}, errors.New("error fetching from db")
+		return model.SearchResponse[model.Pet]{}, errors.New("error fetching from db")
 	}
 
-	result := model.SearchResponse{
+	result := model.SearchResponse[model.Pet]{
 		Paging: model.Paging{
 			Total:  uint(total),
 			Offset: request.Offset,

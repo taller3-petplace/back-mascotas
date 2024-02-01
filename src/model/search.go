@@ -9,15 +9,20 @@ type SearchRequest struct {
 	OwnerId string
 }
 
+type SearchParams struct {
+	Offset uint
+	Limit  uint
+}
+
 type Paging struct {
 	Total  uint `json:"total"`
 	Offset uint `json:"offset"`
 	Limit  uint `json:"limit"`
 }
 
-type SearchResponse struct {
+type SearchResponse[T any] struct {
 	Paging  Paging `json:"paging"`
-	Results []Pet  `json:"results"`
+	Results []T    `json:"results"`
 }
 
 func NewSearchRequest() SearchRequest {

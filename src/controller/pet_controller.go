@@ -43,9 +43,12 @@ func ValidateNewAnimal(pet model.Pet) error {
 //	@Tags			Pet
 //	@Accept			json
 //	@Produce		json
-//	@Param			pet	body		Pet	true	"pet info"
-//	@Success		201	{object}	model.Pet
-//	@Failure		400	{object}	APIError
+//	@Param			Authorization	header		string	true	"JWT header"
+//	@Param			X-Telegram-App	header		bool	true	"request from telegram"
+//	@Param			X-Telegram-Id	header		string	false	"chat id of the telegram user"
+//	@Param			pet				body		Pet		true	"pet info"
+//	@Success		201				{object}	model.Pet
+//	@Failure		400				{object}	APIError
 //	@Router			/pets/pet [post]
 func (pc *PremiumPetController) New(c *gin.Context) {
 
@@ -68,9 +71,12 @@ func (pc *PremiumPetController) New(c *gin.Context) {
 //	@Tags			Pet
 //	@Accept			json
 //	@Produce		json
-//	@Param			id		path		int	true	"id of the pet"
-//	@Success		200		{object}	model.Pet
-//	@Failure		400,404	{object}	APIError
+//	@Param			Authorization	header		string	true	"JWT header"
+//	@Param			X-Telegram-App	header		bool	true	"request from telegram"
+//	@Param			X-Telegram-Id	header		string	false	"chat id of the telegram user"
+//	@Param			id				path		int		true	"id of the pet"
+//	@Success		200				{object}	model.Pet
+//	@Failure		400,404			{object}	APIError
 //	@Router			/pets/pet/{id} [get]
 func (pc *PremiumPetController) Get(c *gin.Context) {
 	pc.ABMController.Get(c)
@@ -83,10 +89,13 @@ func (pc *PremiumPetController) Get(c *gin.Context) {
 //	@Tags			Pet
 //	@Accept			json
 //	@Produce		json
-//	@Param			id		path		int	true	"id of the pet"
-//	@Param			pet		body		Pet	true	"pet info"
-//	@Success		200		{object}	model.Pet
-//	@Failure		400,404	{object}	APIError
+//	@Param			Authorization	header		string	true	"JWT header"
+//	@Param			X-Telegram-App	header		bool	true	"request from telegram"
+//	@Param			X-Telegram-Id	header		string	false	"chat id of the telegram user"
+//	@Param			id				path		int		true	"id of the pet"
+//	@Param			pet				body		Pet		true	"pet info"
+//	@Success		200				{object}	model.Pet
+//	@Failure		400,404			{object}	APIError
 //	@Router			/pets/pet/{id} [put]
 func (pc *PremiumPetController) Edit(c *gin.Context) {
 
@@ -109,9 +118,12 @@ func (pc *PremiumPetController) Edit(c *gin.Context) {
 //	@Tags			Pet
 //	@Accept			json
 //	@Produce		json
-//	@Param			id	path		int	true	"id of the pet"
-//	@Success		204	{object}	nil
-//	@Failure		400	{object}	APIError
+//	@Param			Authorization	header		string	true	"JWT header"
+//	@Param			X-Telegram-App	header		bool	true	"request from telegram"
+//	@Param			X-Telegram-Id	header		string	false	"chat id of the telegram user"
+//	@Param			id				path		int		true	"id of the pet"
+//	@Success		204				{object}	nil
+//	@Failure		400				{object}	APIError
 //	@Router			/pets/pet/{id} [delete]
 func (pc *PremiumPetController) Delete(c *gin.Context) {
 	pc.ABMController.Delete(c)
@@ -124,11 +136,14 @@ func (pc *PremiumPetController) Delete(c *gin.Context) {
 //	@Tags			Pet
 //	@Accept			json
 //	@Produce		json
-//	@Param			owner_id	path		string	true	"owner id to get pets"
-//	@Param			offset		query		int		false	"offset of the results"
-//	@Param			limit		query		int		false	"limit of the results "
-//	@Success		200			{object}	model.SearchResponse
-//	@Failure		400,404		{object}	APIError
+//	@Param			Authorization	header		string	true	"JWT header"
+//	@Param			X-Telegram-App	header		bool	true	"request from telegram"
+//	@Param			X-Telegram-Id	header		string	false	"chat id of the telegram user"
+//	@Param			owner_id		path		string	true	"owner id to get pets"
+//	@Param			offset			query		int		false	"offset of the results"
+//	@Param			limit			query		int		false	"limit of the results "
+//	@Success		200				{object}	model.SearchResponse[model.Pet]
+//	@Failure		400,404			{object}	APIError
 //	@Router			/pets/owner/{owner_id} [get]
 func (pc *PremiumPetController) GetPetsByOwner(c *gin.Context) {
 

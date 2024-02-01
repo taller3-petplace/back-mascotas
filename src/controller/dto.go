@@ -55,3 +55,8 @@ type Doctor struct {
 	Phone string `json:"phone" example:"123456789"`
 	Email string `json:"email" example:"JuanValdez@gmail.com"`
 }
+
+type SearchVeterinaryResponse struct {
+	Paging  model.Paging       `json:"paging"`
+	Results []model.Veterinary `json:"results"`
+}

@@ -148,13 +148,22 @@ definitions:
       type:
         $ref: '#/definitions/model.AnimalType'
     type: object
-  model.SearchResponse:
+  model.SearchResponse-model_Pet:
     properties:
       paging:
         $ref: '#/definitions/model.Paging'
       results:
         items:
           $ref: '#/definitions/model.Pet'
+        type: array
+    type: object
+  model.SearchResponse-model_Veterinary:
+    properties:
+      paging:
+        $ref: '#/definitions/model.Paging'
+      results:
+        items:
+          $ref: '#/definitions/model.Veterinary'
         type: array
     type: object
   model.VaccinationPlan:
@@ -225,6 +234,20 @@ paths:
       - application/json
       description: Get a pet list given the owner ID
       parameters:
+      - description: JWT header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: request from telegram
+        in: header
+        name: X-Telegram-App
+        required: true
+        type: boolean
+      - description: chat id of the telegram user
+        in: header
+        name: X-Telegram-Id
+        type: string
       - description: owner id to get pets
         in: path
         name: owner_id
@@ -244,7 +267,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.SearchResponse'
+            $ref: '#/definitions/model.SearchResponse-model_Pet'
         "400":
           description: Bad Request
           schema:
@@ -262,6 +285,20 @@ paths:
       - application/json
       description: Create a pet for a given user
       parameters:
+      - description: JWT header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: request from telegram
+        in: header
+        name: X-Telegram-App
+        required: true
+        type: boolean
+      - description: chat id of the telegram user
+        in: header
+        name: X-Telegram-Id
+        type: string
       - description: pet info
         in: body
         name: pet
@@ -288,6 +325,20 @@ paths:
       - application/json
       description: Delete a pet given a pet ID
       parameters:
+      - description: JWT header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: request from telegram
+        in: header
+        name: X-Telegram-App
+        required: true
+        type: boolean
+      - description: chat id of the telegram user
+        in: header
+        name: X-Telegram-Id
+        type: string
       - description: id of the pet
         in: path
         name: id
@@ -310,6 +361,20 @@ paths:
       - application/json
       description: Get pet info given a pet ID
       parameters:
+      - description: JWT header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: request from telegram
+        in: header
+        name: X-Telegram-App
+        required: true
+        type: boolean
+      - description: chat id of the telegram user
+        in: header
+        name: X-Telegram-Id
+        type: string
       - description: id of the pet
         in: path
         name: id
@@ -338,6 +403,20 @@ paths:
       - application/json
       description: Edit pet info given a pet ID and pet info needed to update
       parameters:
+      - description: JWT header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: request from telegram
+        in: header
+        name: X-Telegram-App
+        required: true
+        type: boolean
+      - description: chat id of the telegram user
+        in: header
+        name: X-Telegram-Id
+        type: string
       - description: id of the pet
         in: path
         name: id
@@ -409,6 +488,20 @@ paths:
       - application/json
       description: Create a vaccine
       parameters:
+      - description: JWT header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: request from telegram
+        in: header
+        name: X-Telegram-App
+        required: true
+        type: boolean
+      - description: chat id of the telegram user
+        in: header
+        name: X-Telegram-Id
+        type: string
       - description: vaccine info
         in: body
         name: vaccine
@@ -435,6 +528,20 @@ paths:
       - application/json
       description: Delete a Vaccine given a pet ID
       parameters:
+      - description: JWT header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: request from telegram
+        in: header
+        name: X-Telegram-App
+        required: true
+        type: boolean
+      - description: chat id of the telegram user
+        in: header
+        name: X-Telegram-Id
+        type: string
       - description: id of the vaccine
         in: path
         name: id
@@ -457,6 +564,20 @@ paths:
       - application/json
       description: Get vaccine info
       parameters:
+      - description: JWT header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: request from telegram
+        in: header
+        name: X-Telegram-App
+        required: true
+        type: boolean
+      - description: chat id of the telegram user
+        in: header
+        name: X-Telegram-Id
+        type: string
       - description: id of the vaccine
         in: path
         name: id
@@ -485,6 +606,20 @@ paths:
       - application/json
       description: Edit vaccine info given a pet ID and vaccine info needed to update
       parameters:
+      - description: JWT header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: request from telegram
+        in: header
+        name: X-Telegram-App
+        required: true
+        type: boolean
+      - description: chat id of the telegram user
+        in: header
+        name: X-Telegram-Id
+        type: string
       - description: id of the vaccine
         in: path
         name: id
@@ -514,12 +649,77 @@ paths:
       summary: Edit a Vaccine
       tags:
       - Vaccine
+  /veterinaries:
+    get:
+      consumes:
+      - application/json
+      description: Get veterinaries applying filters by city, day_guard, offset and
+        limit
+      parameters:
+      - description: JWT header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: request from telegram
+        in: header
+        name: X-Telegram-App
+        required: true
+        type: boolean
+      - description: chat id of the telegram user
+        in: header
+        name: X-Telegram-Id
+        type: string
+      - description: city of the veterinary
+        in: query
+        name: city
+        type: string
+      - description: day_guard of the veterinary
+        in: query
+        name: day_guard
+        type: integer
+      - description: offset of the results
+        in: query
+        name: offset
+        type: integer
+      - description: 'limit of the results '
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SearchResponse-model_Veterinary'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.APIError'
+      summary: Get veterinaries
+      tags:
+      - Veterinary
   /veterinaries/veterinary:
     post:
       consumes:
       - application/json
       description: Create a Veterinary
       parameters:
+      - description: JWT header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: request from telegram
+        in: header
+        name: X-Telegram-App
+        required: true
+        type: boolean
+      - description: chat id of the telegram user
+        in: header
+        name: X-Telegram-Id
+        type: string
       - description: Veterinary info
         in: body
         name: veterinary
@@ -546,6 +746,20 @@ paths:
       - application/json
       description: Delete a Veterinary given a veterinary ID
       parameters:
+      - description: JWT header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: request from telegram
+        in: header
+        name: X-Telegram-App
+        required: true
+        type: boolean
+      - description: chat id of the telegram user
+        in: header
+        name: X-Telegram-Id
+        type: string
       - description: id of the veterinary
         in: path
         name: id
@@ -568,6 +782,20 @@ paths:
       - application/json
       description: Get veterinary info given a veterinary ID
       parameters:
+      - description: JWT header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: request from telegram
+        in: header
+        name: X-Telegram-App
+        required: true
+        type: boolean
+      - description: chat id of the telegram user
+        in: header
+        name: X-Telegram-Id
+        type: string
       - description: id of the veterinary
         in: path
         name: id
@@ -596,6 +824,20 @@ paths:
       - application/json
       description: Edit Veterinary info given a veterinary ID
       parameters:
+      - description: JWT header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: request from telegram
+        in: header
+        name: X-Telegram-App
+        required: true
+        type: boolean
+      - description: chat id of the telegram user
+        in: header
+        name: X-Telegram-Id
+        type: string
       - description: id of the Veterinary
         in: path
         name: id

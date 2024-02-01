@@ -31,6 +31,26 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
+                        "description": "JWT header",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "request from telegram",
+                        "name": "X-Telegram-App",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "chat id of the telegram user",
+                        "name": "X-Telegram-Id",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
                         "description": "owner id to get pets",
                         "name": "owner_id",
                         "in": "path",
@@ -53,7 +73,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.SearchResponse"
+                            "$ref": "#/definitions/model.SearchResponse-model_Pet"
                         }
                     },
                     "400": {
@@ -85,6 +105,26 @@ const docTemplate = `{
                 ],
                 "summary": "Creates a Pet",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "JWT header",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "request from telegram",
+                        "name": "X-Telegram-App",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "chat id of the telegram user",
+                        "name": "X-Telegram-Id",
+                        "in": "header"
+                    },
                     {
                         "description": "pet info",
                         "name": "pet",
@@ -125,6 +165,26 @@ const docTemplate = `{
                 ],
                 "summary": "Get a Pet",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "JWT header",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "request from telegram",
+                        "name": "X-Telegram-App",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "chat id of the telegram user",
+                        "name": "X-Telegram-Id",
+                        "in": "header"
+                    },
                     {
                         "type": "integer",
                         "description": "id of the pet",
@@ -167,6 +227,26 @@ const docTemplate = `{
                 ],
                 "summary": "Edit a Pet",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "JWT header",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "request from telegram",
+                        "name": "X-Telegram-App",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "chat id of the telegram user",
+                        "name": "X-Telegram-Id",
+                        "in": "header"
+                    },
                     {
                         "type": "integer",
                         "description": "id of the pet",
@@ -218,6 +298,26 @@ const docTemplate = `{
                 ],
                 "summary": "Delete a Pet",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "JWT header",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "request from telegram",
+                        "name": "X-Telegram-App",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "chat id of the telegram user",
+                        "name": "X-Telegram-Id",
+                        "in": "header"
+                    },
                     {
                         "type": "integer",
                         "description": "id of the pet",
@@ -308,6 +408,26 @@ const docTemplate = `{
                 "summary": "Creates a Vaccine",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "JWT header",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "request from telegram",
+                        "name": "X-Telegram-App",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "chat id of the telegram user",
+                        "name": "X-Telegram-Id",
+                        "in": "header"
+                    },
+                    {
                         "description": "vaccine info",
                         "name": "vaccine",
                         "in": "body",
@@ -347,6 +467,26 @@ const docTemplate = `{
                 ],
                 "summary": "Get a Vaccine",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "JWT header",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "request from telegram",
+                        "name": "X-Telegram-App",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "chat id of the telegram user",
+                        "name": "X-Telegram-Id",
+                        "in": "header"
+                    },
                     {
                         "type": "integer",
                         "description": "id of the vaccine",
@@ -389,6 +529,26 @@ const docTemplate = `{
                 ],
                 "summary": "Edit a Vaccine",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "JWT header",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "request from telegram",
+                        "name": "X-Telegram-App",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "chat id of the telegram user",
+                        "name": "X-Telegram-Id",
+                        "in": "header"
+                    },
                     {
                         "type": "integer",
                         "description": "id of the vaccine",
@@ -441,6 +601,26 @@ const docTemplate = `{
                 "summary": "Delete a Vaccine",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "JWT header",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "request from telegram",
+                        "name": "X-Telegram-App",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "chat id of the telegram user",
+                        "name": "X-Telegram-Id",
+                        "in": "header"
+                    },
+                    {
                         "type": "integer",
                         "description": "id of the vaccine",
                         "name": "id",
@@ -451,6 +631,81 @@ const docTemplate = `{
                 "responses": {
                     "204": {
                         "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/veterinaries": {
+            "get": {
+                "description": "Get veterinaries applying filters by city, day_guard, offset and limit",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Veterinary"
+                ],
+                "summary": "Get veterinaries",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "JWT header",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "request from telegram",
+                        "name": "X-Telegram-App",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "chat id of the telegram user",
+                        "name": "X-Telegram-Id",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "description": "city of the veterinary",
+                        "name": "city",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "day_guard of the veterinary",
+                        "name": "day_guard",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "offset of the results",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "limit of the results ",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.SearchResponse-model_Veterinary"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
@@ -475,6 +730,26 @@ const docTemplate = `{
                 ],
                 "summary": "Creates a Veterinary",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "JWT header",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "request from telegram",
+                        "name": "X-Telegram-App",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "chat id of the telegram user",
+                        "name": "X-Telegram-Id",
+                        "in": "header"
+                    },
                     {
                         "description": "Veterinary info",
                         "name": "veterinary",
@@ -515,6 +790,26 @@ const docTemplate = `{
                 ],
                 "summary": "Get a veterinary",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "JWT header",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "request from telegram",
+                        "name": "X-Telegram-App",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "chat id of the telegram user",
+                        "name": "X-Telegram-Id",
+                        "in": "header"
+                    },
                     {
                         "type": "integer",
                         "description": "id of the veterinary",
@@ -557,6 +852,26 @@ const docTemplate = `{
                 ],
                 "summary": "Edit a Veterinary",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "JWT header",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "request from telegram",
+                        "name": "X-Telegram-App",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "chat id of the telegram user",
+                        "name": "X-Telegram-Id",
+                        "in": "header"
+                    },
                     {
                         "type": "integer",
                         "description": "id of the Veterinary",
@@ -608,6 +923,26 @@ const docTemplate = `{
                 ],
                 "summary": "Delete a Veterinary",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "JWT header",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "request from telegram",
+                        "name": "X-Telegram-App",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "chat id of the telegram user",
+                        "name": "X-Telegram-Id",
+                        "in": "header"
+                    },
                     {
                         "type": "integer",
                         "description": "id of the veterinary",
@@ -851,7 +1186,7 @@ const docTemplate = `{
                 }
             }
         },
-        "model.SearchResponse": {
+        "model.SearchResponse-model_Pet": {
             "type": "object",
             "properties": {
                 "paging": {
@@ -861,6 +1196,20 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/model.Pet"
+                    }
+                }
+            }
+        },
+        "model.SearchResponse-model_Veterinary": {
+            "type": "object",
+            "properties": {
+                "paging": {
+                    "$ref": "#/definitions/model.Paging"
+                },
+                "results": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Veterinary"
                     }
                 }
             }

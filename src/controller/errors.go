@@ -14,6 +14,9 @@ var (
 	MissingParams     = errors.New("missing params on request")
 	EntityNotFound    = errors.New("entity not found")
 	ServiceError      = errors.New("service error")
+
+	// Veterinary
+	errCityNotFound = errors.New("city not found")
 )
 
 type APIError struct {

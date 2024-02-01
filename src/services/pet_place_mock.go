@@ -81,10 +81,10 @@ func (mr *MockPetServiceMockRecorder) Get(petID any) *gomock.Call {
 }
 
 // GetPetsByOwner mocks base method.
-func (m *MockPetService) GetPetsByOwner(request model.SearchRequest) (model.SearchResponse, error) {
+func (m *MockPetService) GetPetsByOwner(request model.SearchRequest) (model.SearchResponse[model.Pet], error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetPetsByOwner", request)
-	ret0, _ := ret[0].(model.SearchResponse)
+	ret0, _ := ret[0].(model.SearchResponse[model.Pet])
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

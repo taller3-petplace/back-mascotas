@@ -45,9 +45,12 @@ func ValidateVaccine(v model.Vaccine) error {
 //	@Tags			Vaccine
 //	@Accept			json
 //	@Produce		json
-//	@Param			vaccine	body		Vaccine	true	"vaccine info"
-//	@Success		201		{object}	model.Vaccine
-//	@Failure		400		{object}	APIError
+//	@Param			Authorization	header		string	true	"JWT header"
+//	@Param			X-Telegram-App	header		bool	true	"request from telegram"
+//	@Param			X-Telegram-Id	header		string	false	"chat id of the telegram user"
+//	@Param			vaccine			body		Vaccine	true	"vaccine info"
+//	@Success		201				{object}	model.Vaccine
+//	@Failure		400				{object}	APIError
 //	@Router			/vaccines/vaccine [post]
 func (vs *VaccineController) New(c *gin.Context) {
 	vs.ABMController.New(c)
@@ -60,9 +63,12 @@ func (vs *VaccineController) New(c *gin.Context) {
 //	@Tags			Vaccine
 //	@Accept			json
 //	@Produce		json
-//	@Param			id		path		int	true	"id of the vaccine"
-//	@Success		200		{object}	model.Vaccine
-//	@Failure		400,404	{object}	APIError
+//	@Param			Authorization	header		string	true	"JWT header"
+//	@Param			X-Telegram-App	header		bool	true	"request from telegram"
+//	@Param			X-Telegram-Id	header		string	false	"chat id of the telegram user"
+//	@Param			id				path		int		true	"id of the vaccine"
+//	@Success		200				{object}	model.Vaccine
+//	@Failure		400,404			{object}	APIError
 //	@Router			/vaccines/vaccine/{id} [get]
 func (vs *VaccineController) Get(c *gin.Context) {
 	vs.ABMController.Get(c)
@@ -75,10 +81,13 @@ func (vs *VaccineController) Get(c *gin.Context) {
 //	@Tags			Vaccine
 //	@Accept			json
 //	@Produce		json
-//	@Param			id		path		int		true	"id of the vaccine"
-//	@Param			vaccine	body		Vaccine	true	"vaccine info"
-//	@Success		200		{object}	model.Vaccine
-//	@Failure		400,404	{object}	APIError
+//	@Param			Authorization	header		string	true	"JWT header"
+//	@Param			X-Telegram-App	header		bool	true	"request from telegram"
+//	@Param			X-Telegram-Id	header		string	false	"chat id of the telegram user"
+//	@Param			id				path		int		true	"id of the vaccine"
+//	@Param			vaccine			body		Vaccine	true	"vaccine info"
+//	@Success		200				{object}	model.Vaccine
+//	@Failure		400,404			{object}	APIError
 //	@Router			/vaccines/vaccine/{id} [put]
 func (vs *VaccineController) Edit(c *gin.Context) {
 	vs.ABMController.Edit(c)
@@ -91,9 +100,12 @@ func (vs *VaccineController) Edit(c *gin.Context) {
 //	@Tags			Vaccine
 //	@Accept			json
 //	@Produce		json
-//	@Param			id	path		int	true	"id of the vaccine"
-//	@Success		204	{object}	nil
-//	@Failure		400	{object}	APIError
+//	@Param			Authorization	header		string	true	"JWT header"
+//	@Param			X-Telegram-App	header		bool	true	"request from telegram"
+//	@Param			X-Telegram-Id	header		string	false	"chat id of the telegram user"
+//	@Param			id				path		int		true	"id of the vaccine"
+//	@Success		204				{object}	nil
+//	@Failure		400				{object}	APIError
 //	@Router			/vaccines/vaccine/{id} [delete]
 func (vs *VaccineController) Delete(c *gin.Context) {
 	vs.ABMController.Delete(c)
@@ -109,11 +121,15 @@ func (vs *VaccineController) Delete(c *gin.Context) {
 //	@Tags			Vaccine
 //	@Accept			json
 //	@Produce		json
+//  @Param			Authorization	header		string	true	"JWT header"
+//	@Param			X-Telegram-App	header		bool	true	"request from telegram"
+//	@Param			X-Telegram-Id	header		string	false	"chat id of the telegram user"
 //	@Param			vaccine_id	path		int	true	"vaccine id to apply on pet"
 //	@Param			pet_id		path		int	true	"pet id of the target pet"
 //	@Success		201			{object}	nil
 //	@Failure		400,404		{object}	APIError
 //	@Router			/vaccines/apply/{vaccine_id}/to/{pet_id} [post]
+
 func (vs *VaccineController) ApplyVaccineToPet(c *gin.Context) {
 
 		vaccineIDStr, ok := c.Params.Get("id")
