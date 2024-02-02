@@ -38,10 +38,14 @@ func extractDataFromJWT(tokenString string) (*jwtData, error) {
 
 	// Access the claims if the signature is valid
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		telegramId := ""
+		if claims["telegram_id"] != nil {
+			telegramId = claims["telegram_id"].(string)
+		}
 		return &jwtData{
 			userID:     claims["user_id"].(string),
 			email:      claims["email"].(string),
-			telegramID: claims["telegram_id"].(string),
+			telegramID: telegramId,
 		}, nil
 	}
 
