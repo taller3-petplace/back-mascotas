@@ -35,3 +35,36 @@ func getSearchParams(c *gin.Context) (*model.SearchParams, *APIError) {
 		Limit:  uint(limit),
 	}, nil
 }
+
+func getLocation(c *gin.Context) (*model.Location, *APIError) {
+	latitudeStr := c.Query("latitude")
+	if latitudeStr == "" {
+		err := fmt.Errorf("%v: expected longitude", MissingParams)
+		return nil, NewApiError(err, http.StatusBadRequest)
+	}
+
+	longitudeStr := c.Query("longitude")
+	if longitudeStr == "" {
+		err := fmt.Errorf("%v: expected longitude", MissingParams)
+		return nil, NewApiError(err, http.StatusBadRequest)
+	}
+
+	latitude, err := strconv.ParseFloat(latitudeStr, 64)
+	if err != nil {
+		apiErr := fmt.Errorf("error parsing latitude: %v", err)
+		return nil, NewApiError(apiErr, http.StatusBadRequest)
+	}
+
+	longitude, err := strconv.ParseFloat(longitudeStr, 64)
+	if err != nil {
+		apiErr := fmt.Errorf("error parsing longitude: %v", err)
+		return nil, NewApiError(apiErr, http.StatusBadRequest)
+	}
+
+	loc := model.Location{
+		Latitude:  latitude,
+		Longitude: longitude,
+	}
+
+	return &loc, nil
+}

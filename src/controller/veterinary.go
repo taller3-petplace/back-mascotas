@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"petplace/back-mascotas/src/model"
 	"petplace/back-mascotas/src/services"
+	"strconv"
 )
 
 type VeterinaryController struct {
@@ -151,6 +152,75 @@ func (vc *VeterinaryController) GetAll(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func (vc *VeterinaryController) GetNearest(context *gin.Context) {
+// GetNearest godoc
+//
+//	@Summary		Get nearest
+//	@Description	Get nearest veterinary given a latitude and longitude and optional radio
+//	@Tags			Veterinary
+//	@Accept			json
+//	@Produce		json
+//	@Param			Authorization	header		string	true	"JWT header"
+//	@Param			X-Telegram-App	header		bool	true	"request from telegram"
+//	@Param			X-Telegram-Id	header		string	false	"chat id of the telegram user"
+//	@Param			latitude		query		string	true	"latitude of the point of reference" Example(-34.603684)
+//	@Param			longitude		query		string	true	"longitude of the point of reference" Example(-34.603684)
+//	@Param			radius			query		string	false	"radius of the search in km" Example(1)
+//	@Param			offset			query		int		false	"offset of the results"
+//	@Param			limit			query		int		false	"limit of the results "
+//	@Success		200				{object}	model.SearchResponse[model.Veterinary]
+//	@Failure		400				{object}	APIError
+//	@Router			/veterinaries/nearest [get]
+func (vc *VeterinaryController) GetNearest(c *gin.Context) {
 
+	searchParams, apiErr := getSearchParams(c)
+	if apiErr != nil {
+		ReturnError(c, apiErr.Status, apiErr.error, apiErr.Message)
+		return
+	}
+
+	location, apiErr := getLocation(c)
+	if apiErr != nil {
+		ReturnError(c, apiErr.Status, apiErr.error, apiErr.Message)
+		return
+	}
+
+	var radius float64
+	radiusStr := c.Query("radius")
+	if radiusStr != "" {
+		intRadio, err := strconv.Atoi(radiusStr)
+		if err != nil {
+			ReturnError(c, http.StatusBadRequest, err, "error parsing radius")
+			return
+		}
+		radius = float64(intRadio)
+	} else {
+		radius = 1
+	}
+
+	var filters = map[string]string{}
+
+	// TODO: do it more precise with haversine formula
+	kmRadius := radius / 111.32
+
+	filters["latitude <= ?"] = floatToString(location.Latitude + kmRadius)
+	filters["latitude >= ?"] = floatToString(location.Latitude - kmRadius)
+	filters["longitude <= ?"] = floatToString(location.Longitude + kmRadius)
+	filters["longitude >= ?"] = floatToString(location.Longitude - kmRadius)
+
+	response, err := vc.service.GetVeterinaries(filters, searchParams)
+	if err != nil {
+		ReturnError(c, http.StatusInternalServerError, ServiceError, err.Error())
+		return
+	}
+
+	if len(response.Results) == 0 {
+		ReturnError(c, http.StatusNotFound, EntityNotFound, fmt.Sprintf("veterinaries arround %f, %f not found", location.Latitude, location.Longitude))
+		return
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+
+func floatToString(inputNum float64) string {
+	return strconv.FormatFloat(inputNum, 'f', 6, 64)
 }

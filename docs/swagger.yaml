@@ -700,6 +700,64 @@ paths:
       summary: Get veterinaries
       tags:
       - Veterinary
+  /veterinaries/nearest:
+    get:
+      consumes:
+      - application/json
+      description: Get nearest veterinary given a latitude and longitude and optional
+        radio
+      parameters:
+      - description: JWT header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: request from telegram
+        in: header
+        name: X-Telegram-App
+        required: true
+        type: boolean
+      - description: chat id of the telegram user
+        in: header
+        name: X-Telegram-Id
+        type: string
+      - description: latitude of the point of reference
+        example: "-34.603684"
+        in: query
+        name: latitude
+        required: true
+        type: string
+      - description: longitude of the point of reference
+        in: query
+        name: longitude
+        required: true
+        type: string
+      - description: radius of the search in km
+        in: query
+        name: radius
+        type: string
+      - description: offset of the results
+        in: query
+        name: offset
+        type: integer
+      - description: 'limit of the results '
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SearchResponse-model_Veterinary'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.APIError'
+      summary: Get nearest
+      tags:
+      - Veterinary
   /veterinaries/veterinary:
     post:
       consumes:
