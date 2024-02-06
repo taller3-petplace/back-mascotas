@@ -228,6 +228,58 @@ definitions:
 info:
   contact: {}
 paths:
+  /pets:
+    get:
+      consumes:
+      - application/json
+      description: Get all pets in the system
+      parameters:
+      - description: JWT header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: request from telegram
+        in: header
+        name: X-Telegram-App
+        required: true
+        type: boolean
+      - description: chat id of the telegram user
+        in: header
+        name: X-Telegram-Id
+        type: string
+      - description: name of pet to search
+        in: query
+        name: name
+        type: string
+      - description: type pet to search
+        in: query
+        name: type
+        type: string
+      - description: owner of the pet to search
+        in: query
+        name: owner_id
+        type: string
+      - description: offset of the results
+        in: query
+        name: offset
+        type: integer
+      - description: 'limit of the results '
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.APIError'
+      summary: Get all pets
+      tags:
+      - Pet
   /pets/owner/{owner_id}:
     get:
       consumes:
@@ -728,11 +780,13 @@ paths:
         required: true
         type: string
       - description: longitude of the point of reference
+        example: "-34.603684"
         in: query
         name: longitude
         required: true
         type: string
       - description: radius of the search in km
+        example: "1"
         in: query
         name: radius
         type: string

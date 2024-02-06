@@ -162,9 +162,9 @@ func (vc *VeterinaryController) GetAll(c *gin.Context) {
 //	@Param			Authorization	header		string	true	"JWT header"
 //	@Param			X-Telegram-App	header		bool	true	"request from telegram"
 //	@Param			X-Telegram-Id	header		string	false	"chat id of the telegram user"
-//	@Param			latitude		query		string	true	"latitude of the point of reference" Example(-34.603684)
-//	@Param			longitude		query		string	true	"longitude of the point of reference" Example(-34.603684)
-//	@Param			radius			query		string	false	"radius of the search in km" Example(1)
+//	@Param			latitude		query		string	true	"latitude of the point of reference"	Example(-34.603684)
+//	@Param			longitude		query		string	true	"longitude of the point of reference"	Example(-34.603684)
+//	@Param			radius			query		string	false	"radius of the search in km"			Example(1)
 //	@Param			offset			query		int		false	"offset of the results"
 //	@Param			limit			query		int		false	"limit of the results "
 //	@Success		200				{object}	model.SearchResponse[model.Veterinary]
@@ -184,15 +184,15 @@ func (vc *VeterinaryController) GetNearest(c *gin.Context) {
 		return
 	}
 
+	var err error
 	var radius float64
 	radiusStr := c.Query("radius")
 	if radiusStr != "" {
-		intRadio, err := strconv.Atoi(radiusStr)
+		radius, err = strconv.ParseFloat(radiusStr, 64)
 		if err != nil {
 			ReturnError(c, http.StatusBadRequest, err, "error parsing radius")
 			return
 		}
-		radius = float64(intRadio)
 	} else {
 		radius = 1
 	}

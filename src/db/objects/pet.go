@@ -14,7 +14,7 @@ type Pet struct {
 	UpdatedAt time.Time      `gorm:"type:timestamptz"`
 	BirthDate time.Time      `gorm:"type:date"`
 	DeletedAt gorm.DeletedAt `gorm:"type:timestamptz"`
-	OwnerID   string
+	OwnerID   string         `gorm:"type:string"`
 	IMGUrl    string
 }
 

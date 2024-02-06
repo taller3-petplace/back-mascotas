@@ -9,6 +9,7 @@ import (
 	"petplace/back-mascotas/src/requester"
 	"petplace/back-mascotas/src/services"
 	"strconv"
+	"time"
 )
 
 type PremiumPetController struct {
@@ -210,6 +211,61 @@ func (pc *PremiumPetController) GetPetsByOwner(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response)
 
+}
+
+// GetAll godoc
+//
+//	@Summary		Get all pets
+//	@Description	Get all pets in the system
+//	@Tags			Pet
+//	@Accept			json
+//	@Produce		json
+//	@Param			Authorization	header		string	true	"JWT header"
+//	@Param			X-Telegram-App	header		bool	true	"request from telegram"
+//	@Param			X-Telegram-Id	header		string	false	"chat id of the telegram user"
+//	@Param			name			query		string	false	"name of pet to search"
+//	@Param			type			query		string	false	"type pet to search"
+//	@Param			owner_id		query		string	false	"owner of the pet to search"
+//	@Param			offset			query		int		false	"offset of the results"
+//	@Param			limit			query		int		false	"limit of the results "
+//	@Success		204				{object}	nil
+//	@Failure		400				{object}	APIError
+//	@Router			/pets [get]
+func (pc *PremiumPetController) GetAll(c *gin.Context) {
+
+	fmt.Printf("%v", time.Now())
+	searchParams, apiErr := getSearchParams(c)
+	if apiErr != nil {
+		ReturnError(c, apiErr.Status, apiErr.error, apiErr.Message)
+		return
+	}
+
+	var params = map[string]string{}
+	params["name"] = c.Query("name")
+	params["type"] = c.Query("type")
+	params["register_date"] = c.Query("register_date")
+	params["birth_date"] = c.Query("birth_date")
+	params["owner_id"] = c.Query("owner_id")
+
+	var filters = map[string]string{}
+	for key, value := range params {
+		if value != "" {
+			filters[key] = value
+		}
+	}
+
+	response, err := pc.service.GetPetsFiltered(filters, searchParams)
+	if err != nil {
+		ReturnError(c, http.StatusInternalServerError, ServiceError, err.Error())
+		return
+	}
+
+	if len(response.Results) == 0 {
+		ReturnError(c, http.StatusNotFound, EntityNotFound, fmt.Sprintf("not found pets"))
+		return
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
 func (pc *PremiumPetController) handleTelegramID(c *gin.Context, telegramIDStr string) *APIError {

@@ -15,6 +15,7 @@ func (r *Routes) AddPetRoutes(service services.PetService, userService *requeste
 	group.POST("/pet", c.New)
 	group.GET("/pet/:id", c.Get)
 	group.GET("/owner/:owner_id", c.GetPetsByOwner)
+	group.GET("/", c.GetAll)
 	group.PUT("/pet/:id", c.Edit)
 	group.DELETE("/pet/:id", c.Delete)
 

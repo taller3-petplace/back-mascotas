@@ -15,6 +15,84 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/pets": {
+            "get": {
+                "description": "Get all pets in the system",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pet"
+                ],
+                "summary": "Get all pets",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "JWT header",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "request from telegram",
+                        "name": "X-Telegram-App",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "chat id of the telegram user",
+                        "name": "X-Telegram-Id",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "description": "name of pet to search",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "type pet to search",
+                        "name": "type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "owner of the pet to search",
+                        "name": "owner_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "offset of the results",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "limit of the results ",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.APIError"
+                        }
+                    }
+                }
+            }
+        },
         "/pets/owner/{owner_id}": {
             "get": {
                 "description": "Get a pet list given the owner ID",
@@ -760,6 +838,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "example": "-34.603684",
                         "description": "longitude of the point of reference",
                         "name": "longitude",
                         "in": "query",
@@ -767,6 +846,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "example": "1",
                         "description": "radius of the search in km",
                         "name": "radius",
                         "in": "query"
