@@ -16,8 +16,6 @@ type Veterinary struct {
 	WebSite   string
 	IMGUrl    string
 	City      string
-	Latitude  float64
-	Longitude float64
 	DayGuard  int
 	Doctors   Doctors        `gorm:"type:json"`
 	CreatedAt time.Time      `gorm:"type:timestamp"`
@@ -58,18 +56,11 @@ func (v *Veterinary) FromModel(vet model.Veterinary) {
 	v.WebSite = vet.WebSite
 	v.IMGUrl = vet.IMGUrl
 	v.City = vet.City
-	v.Latitude = vet.Location.Latitude
-	v.Longitude = vet.Location.Longitude
 	v.DayGuard = vet.DayGuard
 	v.Doctors.FromModel(vet.Doctors)
 }
 
 func (v *Veterinary) ToModel() model.Veterinary {
-
-	var loc = model.Location{
-		Latitude:  v.Latitude,
-		Longitude: v.Longitude,
-	}
 
 	var result model.Veterinary
 	result.ID = int(v.ID)
@@ -80,7 +71,6 @@ func (v *Veterinary) ToModel() model.Veterinary {
 	result.WebSite = v.WebSite
 	result.IMGUrl = v.IMGUrl
 	result.City = v.City
-	result.Location = loc
 	result.DayGuard = v.DayGuard
 	result.Doctors = v.Doctors.ToModel()
 	return result

@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 	"petplace/back-mascotas/src/model"
 	"petplace/back-mascotas/src/services"
@@ -10,22 +11,16 @@ import (
 )
 
 type VeterinaryController struct {
-	ABMController[model.Veterinary]
-	service services.VeterinaryService
+	s    services.VeterinaryService
+	name string
 }
 
 func NewVeterinaryController(s services.VeterinaryService) VeterinaryController {
 
 	temp := VeterinaryController{}
-	temp.service = s
 	temp.s = s
-	temp.Validate = ValidateVeterinary
 	temp.name = "VETERINARY"
 	return temp
-}
-
-func ValidateVeterinary(v model.Veterinary) error {
-	return nil
 }
 
 // New godoc
@@ -43,7 +38,26 @@ func ValidateVeterinary(v model.Veterinary) error {
 //	@Failure		400				{object}	APIError
 //	@Router			/veterinaries/veterinary [post]
 func (vc *VeterinaryController) New(c *gin.Context) {
-	vc.ABMController.New(c)
+	log.Debugf(logTemplate, vc.name, "NEW", fmt.Sprintf("new request | body: %v", getBodyString(c)))
+
+	var e model.Veterinary
+	err := c.BindJSON(&e)
+	if err != nil {
+		log.Debugf(logTemplate, vc.name, "NEW", err)
+		ReturnError(c, http.StatusBadRequest, EntityFormatError, err.Error())
+		return
+	}
+
+	e, err = vc.s.New(e)
+	if err != nil {
+		log.Debugf(logTemplate, vc.name, "NEW", err)
+		ReturnError(c, http.StatusInternalServerError, RegisterError, err.Error())
+		return
+	}
+
+	log.Debugf(logTemplate, vc.name, "NEW", fmt.Sprintf("success | response: %v", e))
+
+	c.JSON(http.StatusCreated, e)
 }
 
 // Get godoc
@@ -61,7 +75,34 @@ func (vc *VeterinaryController) New(c *gin.Context) {
 //	@Failure		400,404			{object}	APIError
 //	@Router			/veterinaries/veterinary/{id} [get]
 func (vc *VeterinaryController) Get(c *gin.Context) {
-	vc.ABMController.Get(c)
+	idStr, ok := c.Params.Get(IDParamName)
+	if !ok || idStr == "" {
+		log.Debugf(logTemplate, vc.name, "GET", "expected entity id")
+		ReturnError(c, http.StatusBadRequest, MissingParams, "expected entity id")
+		return
+	}
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		log.Debugf(logTemplate, vc.name, "GET", "cannot parse id: "+err.Error())
+		ReturnError(c, http.StatusBadRequest, MissingParams, "cannot parse id: "+err.Error())
+		return
+	}
+
+	e, err := vc.s.Get(id)
+	if err != nil {
+		log.Errorf(logTemplate, vc.name, "GET", err)
+		ReturnError(c, http.StatusInternalServerError, ServiceError, err.Error())
+		return
+	}
+
+	if e.IsZeroValue() {
+		log.Debugf(logTemplate, vc.name, "GET", "entity not found")
+		ReturnError(c, http.StatusNotFound, EntityNotFound, fmt.Sprintf("entity id '%d' not found", id))
+		return
+	}
+	log.Debugf(logTemplate, vc.name, "NEW", fmt.Sprintf("success | response: %v", e))
+	c.JSON(http.StatusOK, e)
 }
 
 // Edit godoc
@@ -80,7 +121,50 @@ func (vc *VeterinaryController) Get(c *gin.Context) {
 //	@Failure		400,404			{object}	APIError
 //	@Router			/veterinaries/veterinary/{id} [put]
 func (vc *VeterinaryController) Edit(c *gin.Context) {
-	vc.ABMController.Edit(c)
+	log.Debugf(logTemplate, vc.name, "EDIT", fmt.Sprintf("edit request | body: %s", getBodyString(c)))
+
+	idStr, ok := c.Params.Get(IDParamName)
+	if !ok || idStr == "" {
+		log.Debugf(logTemplate, vc.name, "EDIT", "expected entity id")
+		ReturnError(c, http.StatusBadRequest, MissingParams, "expected entity id")
+		return
+	}
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		log.Debugf(logTemplate, vc.name, "EDIT", "cannot parse id: "+err.Error())
+		ReturnError(c, http.StatusBadRequest, MissingParams, "cannot parse id: "+err.Error())
+		return
+	}
+
+	e, err := vc.s.Get(id)
+	if err != nil {
+		log.Errorf(logTemplate, vc.name, "GET", err)
+		ReturnError(c, http.StatusInternalServerError, RegisterError, err.Error())
+		return
+	}
+	if e.IsZeroValue() {
+		log.Debugf(logTemplate, vc.name, "EDIT", "entity not found")
+		ReturnError(c, http.StatusNotFound, EntityNotFound, fmt.Sprintf("entity id '%d' not found", id))
+		return
+	}
+
+	err = c.BindJSON(&e)
+	if err != nil {
+		log.Debugf(logTemplate, vc.name, "EDIT", err)
+		ReturnError(c, http.StatusBadRequest, EntityFormatError, err.Error())
+		return
+	}
+
+	e, err = vc.s.Edit(id, e)
+	if err != nil {
+		log.Errorf(logTemplate, vc.name, "EDIT", err)
+		ReturnError(c, http.StatusInternalServerError, RegisterError, err.Error())
+		return
+	}
+
+	log.Debugf(logTemplate, vc.name, "NEW", fmt.Sprintf("success | response: %v", e))
+	c.JSON(http.StatusOK, e)
 }
 
 // Delete godoc
@@ -98,7 +182,23 @@ func (vc *VeterinaryController) Edit(c *gin.Context) {
 //	@Failure		400				{object}	APIError
 //	@Router			/veterinaries/veterinary/{id} [delete]
 func (vc *VeterinaryController) Delete(c *gin.Context) {
-	vc.ABMController.Delete(c)
+	idStr, ok := c.Params.Get(IDParamName)
+	if !ok || idStr == "" {
+		log.Debugf(logTemplate, vc.name, "DELETE", "expected entity id")
+		ReturnError(c, http.StatusBadRequest, MissingParams, "expected entity id")
+		return
+	}
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		log.Debugf(logTemplate, vc.name, "DELETE", err)
+		ReturnError(c, http.StatusBadRequest, MissingParams, "cannot parse id: "+err.Error())
+		return
+	}
+
+	vc.s.Delete(id)
+	log.Debugf(logTemplate, vc.name, "DELETE", "success")
+	c.JSON(http.StatusNoContent, nil)
 }
 
 // GetAll godoc
@@ -138,7 +238,7 @@ func (vc *VeterinaryController) GetAll(c *gin.Context) {
 		filters["day_guard"] = guardDay
 	}
 
-	response, err := vc.service.GetVeterinaries(filters, searchParams)
+	response, err := vc.s.GetVeterinaries(filters, searchParams)
 	if err != nil {
 		ReturnError(c, http.StatusInternalServerError, ServiceError, err.Error())
 		return
@@ -150,77 +250,4 @@ func (vc *VeterinaryController) GetAll(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, response)
-}
-
-// GetNearest godoc
-//
-//	@Summary		Get nearest
-//	@Description	Get nearest veterinary given a latitude and longitude and optional radio
-//	@Tags			Veterinary
-//	@Accept			json
-//	@Produce		json
-//	@Param			Authorization	header		string	true	"JWT header"
-//	@Param			X-Telegram-App	header		bool	true	"request from telegram"
-//	@Param			X-Telegram-Id	header		string	false	"chat id of the telegram user"
-//	@Param			latitude		query		string	true	"latitude of the point of reference"	Example(-34.603684)
-//	@Param			longitude		query		string	true	"longitude of the point of reference"	Example(-34.603684)
-//	@Param			radius			query		string	false	"radius of the search in km"			Example(1)
-//	@Param			offset			query		int		false	"offset of the results"
-//	@Param			limit			query		int		false	"limit of the results "
-//	@Success		200				{object}	model.SearchResponse[model.Veterinary]
-//	@Failure		400				{object}	APIError
-//	@Router			/veterinaries/nearest [get]
-func (vc *VeterinaryController) GetNearest(c *gin.Context) {
-
-	searchParams, apiErr := getSearchParams(c)
-	if apiErr != nil {
-		ReturnError(c, apiErr.Status, apiErr.error, apiErr.Message)
-		return
-	}
-
-	location, apiErr := getLocation(c)
-	if apiErr != nil {
-		ReturnError(c, apiErr.Status, apiErr.error, apiErr.Message)
-		return
-	}
-
-	var err error
-	var radius float64
-	radiusStr := c.Query("radius")
-	if radiusStr != "" {
-		radius, err = strconv.ParseFloat(radiusStr, 64)
-		if err != nil {
-			ReturnError(c, http.StatusBadRequest, err, "error parsing radius")
-			return
-		}
-	} else {
-		radius = 1
-	}
-
-	var filters = map[string]string{}
-
-	// TODO: do it more precise with haversine formula
-	kmRadius := radius / 111.32
-
-	filters["latitude <= ?"] = floatToString(location.Latitude + kmRadius)
-	filters["latitude >= ?"] = floatToString(location.Latitude - kmRadius)
-	filters["longitude <= ?"] = floatToString(location.Longitude + kmRadius)
-	filters["longitude >= ?"] = floatToString(location.Longitude - kmRadius)
-
-	response, err := vc.service.GetVeterinaries(filters, searchParams)
-	if err != nil {
-		ReturnError(c, http.StatusInternalServerError, ServiceError, err.Error())
-		return
-	}
-
-	if len(response.Results) == 0 {
-		ReturnError(c, http.StatusNotFound, EntityNotFound, fmt.Sprintf("veterinaries arround %f, %f not found", location.Latitude, location.Longitude))
-		return
-	}
-
-	c.JSON(http.StatusOK, response)
-}
-
-func floatToString(inputNum float64) string {
-	return strconv.FormatFloat(inputNum, 'f', 6, 64)
 }

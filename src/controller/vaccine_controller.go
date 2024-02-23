@@ -16,16 +16,14 @@ const (
 )
 
 type VaccineController struct {
-	ABMController[model.Vaccine]
-	service services.VaccineService
+	s    services.VaccineService
+	name string
 }
 
 func NewVaccineController(service services.VaccineService) VaccineController {
 
 	temp := VaccineController{}
-	temp.service = service
-	temp.s = &service
-	temp.Validate = ValidateVaccine
+	temp.s = service
 	temp.name = "VACCINE"
 	return temp
 }
@@ -53,7 +51,33 @@ func ValidateVaccine(v model.Vaccine) error {
 //	@Failure		400				{object}	APIError
 //	@Router			/vaccines/vaccine [post]
 func (vs *VaccineController) New(c *gin.Context) {
-	vs.ABMController.New(c)
+	log.Debugf(logTemplate, vs.name, "NEW", fmt.Sprintf("new request | body: %v", getBodyString(c)))
+
+	var e model.Vaccine
+	err := c.BindJSON(&e)
+	if err != nil {
+		log.Debugf(logTemplate, vs.name, "NEW", err)
+		ReturnError(c, http.StatusBadRequest, EntityFormatError, err.Error())
+		return
+	}
+
+	err = ValidateVaccine(e)
+	if err != nil {
+		log.Debugf(logTemplate, vs.name, "NEW", err)
+		ReturnError(c, http.StatusBadRequest, ValidationError, err.Error())
+		return
+	}
+
+	e, err = vs.s.New(e)
+	if err != nil {
+		log.Debugf(logTemplate, vs.name, "NEW", err)
+		ReturnError(c, http.StatusInternalServerError, RegisterError, err.Error())
+		return
+	}
+
+	log.Debugf(logTemplate, vs.name, "NEW", fmt.Sprintf("success | response: %v", e))
+
+	c.JSON(http.StatusCreated, e)
 }
 
 // Get godoc
@@ -71,7 +95,34 @@ func (vs *VaccineController) New(c *gin.Context) {
 //	@Failure		400,404			{object}	APIError
 //	@Router			/vaccines/vaccine/{id} [get]
 func (vs *VaccineController) Get(c *gin.Context) {
-	vs.ABMController.Get(c)
+	idStr, ok := c.Params.Get(IDParamName)
+	if !ok || idStr == "" {
+		log.Debugf(logTemplate, vs.name, "GET", "expected entity id")
+		ReturnError(c, http.StatusBadRequest, MissingParams, "expected entity id")
+		return
+	}
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		log.Debugf(logTemplate, vs.name, "GET", "cannot parse id: "+err.Error())
+		ReturnError(c, http.StatusBadRequest, MissingParams, "cannot parse id: "+err.Error())
+		return
+	}
+
+	e, err := vs.s.Get(id)
+	if err != nil {
+		log.Errorf(logTemplate, vs.name, "GET", err)
+		ReturnError(c, http.StatusInternalServerError, ServiceError, err.Error())
+		return
+	}
+
+	if e.IsZeroValue() {
+		log.Debugf(logTemplate, vs.name, "GET", "entity not found")
+		ReturnError(c, http.StatusNotFound, EntityNotFound, fmt.Sprintf("entity id '%d' not found", id))
+		return
+	}
+	log.Debugf(logTemplate, vs.name, "NEW", fmt.Sprintf("success | response: %v", e))
+	c.JSON(http.StatusOK, e)
 }
 
 // Edit godoc
@@ -90,7 +141,57 @@ func (vs *VaccineController) Get(c *gin.Context) {
 //	@Failure		400,404			{object}	APIError
 //	@Router			/vaccines/vaccine/{id} [put]
 func (vs *VaccineController) Edit(c *gin.Context) {
-	vs.ABMController.Edit(c)
+	log.Debugf(logTemplate, vs.name, "EDIT", fmt.Sprintf("edit request | body: %s", getBodyString(c)))
+
+	idStr, ok := c.Params.Get(IDParamName)
+	if !ok || idStr == "" {
+		log.Debugf(logTemplate, vs.name, "EDIT", "expected entity id")
+		ReturnError(c, http.StatusBadRequest, MissingParams, "expected entity id")
+		return
+	}
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		log.Debugf(logTemplate, vs.name, "EDIT", "cannot parse id: "+err.Error())
+		ReturnError(c, http.StatusBadRequest, MissingParams, "cannot parse id: "+err.Error())
+		return
+	}
+
+	e, err := vs.s.Get(id)
+	if err != nil {
+		log.Errorf(logTemplate, vs.name, "GET", err)
+		ReturnError(c, http.StatusInternalServerError, RegisterError, err.Error())
+		return
+	}
+	if e.IsZeroValue() {
+		log.Debugf(logTemplate, vs.name, "EDIT", "entity not found")
+		ReturnError(c, http.StatusNotFound, EntityNotFound, fmt.Sprintf("entity id '%d' not found", id))
+		return
+	}
+
+	err = c.BindJSON(&e)
+	if err != nil {
+		log.Debugf(logTemplate, vs.name, "EDIT", err)
+		ReturnError(c, http.StatusBadRequest, EntityFormatError, err.Error())
+		return
+	}
+
+	err = ValidateVaccine(e)
+	if err != nil {
+		log.Debugf(logTemplate, vs.name, "EDIT", err)
+		ReturnError(c, http.StatusBadRequest, ValidationError, err.Error())
+		return
+	}
+
+	e, err = vs.s.Edit(id, e)
+	if err != nil {
+		log.Errorf(logTemplate, vs.name, "EDIT", err)
+		ReturnError(c, http.StatusInternalServerError, RegisterError, err.Error())
+		return
+	}
+
+	log.Debugf(logTemplate, vs.name, "NEW", fmt.Sprintf("success | response: %v", e))
+	c.JSON(http.StatusOK, e)
 }
 
 // Delete godoc
@@ -108,7 +209,23 @@ func (vs *VaccineController) Edit(c *gin.Context) {
 //	@Failure		400				{object}	APIError
 //	@Router			/vaccines/vaccine/{id} [delete]
 func (vs *VaccineController) Delete(c *gin.Context) {
-	vs.ABMController.Delete(c)
+	idStr, ok := c.Params.Get(IDParamName)
+	if !ok || idStr == "" {
+		log.Debugf(logTemplate, vs.name, "DELETE", "expected entity id")
+		ReturnError(c, http.StatusBadRequest, MissingParams, "expected entity id")
+		return
+	}
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		log.Debugf(logTemplate, vs.name, "DELETE", err)
+		ReturnError(c, http.StatusBadRequest, MissingParams, "cannot parse id: "+err.Error())
+		return
+	}
+
+	vs.s.Delete(id)
+	log.Debugf(logTemplate, vs.name, "DELETE", "success")
+	c.JSON(http.StatusNoContent, nil)
 }
 
 /*
@@ -211,7 +328,7 @@ func (vs *VaccineController) GetVaccinationPlan(c *gin.Context) {
 		return
 	}
 
-	plan, err := vs.service.GetPlanVaccination(petID)
+	plan, err := vs.s.GetPlanVaccination(petID)
 	if err != nil {
 		log.Debugf(logTemplate, vs.name, "APPLYVACCINE", err)
 		ReturnError(c, http.StatusInternalServerError, ServiceError, err.Error())

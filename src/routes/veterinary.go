@@ -16,7 +16,6 @@ func (r *Routes) AddVeterinaryRoutes(service services.VeterinaryService) error {
 	group.PUT("/veterinary/:id", c.Edit)
 	group.DELETE("/veterinary/:id", c.Delete)
 	group.GET("", c.GetAll)
-	group.GET("/nearest", c.GetNearest)
 
 	return nil
 

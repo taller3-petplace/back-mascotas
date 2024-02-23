@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 	"petplace/back-mascotas/src/model"
 	"petplace/back-mascotas/src/requester"
@@ -13,17 +14,15 @@ import (
 )
 
 type PremiumPetController struct {
-	ABMController[model.Pet]
 	service services.PetService
 	users   *requester.Requester
+	name    string
 }
 
 func NewPetController(service services.PetService, usersService *requester.Requester) PremiumPetController {
 
 	temp := PremiumPetController{}
 	temp.service = service
-	temp.s = service
-	temp.Validate = ValidateNewAnimal
 	temp.name = "PET"
 	temp.users = usersService
 	return temp
@@ -62,7 +61,33 @@ func (pc *PremiumPetController) New(c *gin.Context) {
 		}
 	}
 
-	pc.ABMController.New(c)
+	log.Debugf(logTemplate, pc.name, "NEW", fmt.Sprintf("new request | body: %v", getBodyString(c)))
+
+	var e model.Pet
+	err := c.BindJSON(&e)
+	if err != nil {
+		log.Debugf(logTemplate, pc.name, "NEW", err)
+		ReturnError(c, http.StatusBadRequest, EntityFormatError, err.Error())
+		return
+	}
+
+	err = ValidateNewAnimal(e)
+	if err != nil {
+		log.Debugf(logTemplate, pc.name, "NEW", err)
+		ReturnError(c, http.StatusBadRequest, ValidationError, err.Error())
+		return
+	}
+
+	e, err = pc.service.New(e)
+	if err != nil {
+		log.Debugf(logTemplate, pc.name, "NEW", err)
+		ReturnError(c, http.StatusInternalServerError, RegisterError, err.Error())
+		return
+	}
+
+	log.Debugf(logTemplate, pc.name, "NEW", fmt.Sprintf("success | response: %v", e))
+
+	c.JSON(http.StatusCreated, e)
 }
 
 // Get godoc
@@ -80,7 +105,34 @@ func (pc *PremiumPetController) New(c *gin.Context) {
 //	@Failure		400,404			{object}	APIError
 //	@Router			/pets/pet/{id} [get]
 func (pc *PremiumPetController) Get(c *gin.Context) {
-	pc.ABMController.Get(c)
+	idStr, ok := c.Params.Get(IDParamName)
+	if !ok || idStr == "" {
+		log.Debugf(logTemplate, pc.name, "GET", "expected entity id")
+		ReturnError(c, http.StatusBadRequest, MissingParams, "expected entity id")
+		return
+	}
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		log.Debugf(logTemplate, pc.name, "GET", "cannot parse id: "+err.Error())
+		ReturnError(c, http.StatusBadRequest, MissingParams, "cannot parse id: "+err.Error())
+		return
+	}
+
+	e, err := pc.service.Get(id)
+	if err != nil {
+		log.Errorf(logTemplate, pc.name, "GET", err)
+		ReturnError(c, http.StatusInternalServerError, ServiceError, err.Error())
+		return
+	}
+
+	if e.IsZeroValue() {
+		log.Debugf(logTemplate, pc.name, "GET", "entity not found")
+		ReturnError(c, http.StatusNotFound, EntityNotFound, fmt.Sprintf("entity id '%d' not found", id))
+		return
+	}
+	log.Debugf(logTemplate, pc.name, "NEW", fmt.Sprintf("success | response: %v", e))
+	c.JSON(http.StatusOK, e)
 }
 
 // Edit godoc
@@ -109,7 +161,57 @@ func (pc *PremiumPetController) Edit(c *gin.Context) {
 		}
 	}
 
-	pc.ABMController.Edit(c)
+	log.Debugf(logTemplate, pc.name, "EDIT", fmt.Sprintf("edit request | body: %s", getBodyString(c)))
+
+	idStr, ok := c.Params.Get(IDParamName)
+	if !ok || idStr == "" {
+		log.Debugf(logTemplate, pc.name, "EDIT", "expected entity id")
+		ReturnError(c, http.StatusBadRequest, MissingParams, "expected entity id")
+		return
+	}
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		log.Debugf(logTemplate, pc.name, "EDIT", "cannot parse id: "+err.Error())
+		ReturnError(c, http.StatusBadRequest, MissingParams, "cannot parse id: "+err.Error())
+		return
+	}
+
+	e, err := pc.service.Get(id)
+	if err != nil {
+		log.Errorf(logTemplate, pc.name, "GET", err)
+		ReturnError(c, http.StatusInternalServerError, RegisterError, err.Error())
+		return
+	}
+	if e.IsZeroValue() {
+		log.Debugf(logTemplate, pc.name, "EDIT", "entity not found")
+		ReturnError(c, http.StatusNotFound, EntityNotFound, fmt.Sprintf("entity id '%d' not found", id))
+		return
+	}
+
+	err = c.BindJSON(&e)
+	if err != nil {
+		log.Debugf(logTemplate, pc.name, "EDIT", err)
+		ReturnError(c, http.StatusBadRequest, EntityFormatError, err.Error())
+		return
+	}
+
+	err = ValidateNewAnimal(e)
+	if err != nil {
+		log.Debugf(logTemplate, pc.name, "EDIT", err)
+		ReturnError(c, http.StatusBadRequest, ValidationError, err.Error())
+		return
+	}
+
+	e, err = pc.service.Edit(id, e)
+	if err != nil {
+		log.Errorf(logTemplate, pc.name, "EDIT", err)
+		ReturnError(c, http.StatusInternalServerError, RegisterError, err.Error())
+		return
+	}
+
+	log.Debugf(logTemplate, pc.name, "NEW", fmt.Sprintf("success | response: %v", e))
+	c.JSON(http.StatusOK, e)
 }
 
 // Delete godoc
@@ -127,7 +229,23 @@ func (pc *PremiumPetController) Edit(c *gin.Context) {
 //	@Failure		400				{object}	APIError
 //	@Router			/pets/pet/{id} [delete]
 func (pc *PremiumPetController) Delete(c *gin.Context) {
-	pc.ABMController.Delete(c)
+	idStr, ok := c.Params.Get(IDParamName)
+	if !ok || idStr == "" {
+		log.Debugf(logTemplate, pc.name, "DELETE", "expected entity id")
+		ReturnError(c, http.StatusBadRequest, MissingParams, "expected entity id")
+		return
+	}
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		log.Debugf(logTemplate, pc.name, "DELETE", err)
+		ReturnError(c, http.StatusBadRequest, MissingParams, "cannot parse id: "+err.Error())
+		return
+	}
+
+	pc.service.Delete(id)
+	log.Debugf(logTemplate, pc.name, "DELETE", "success")
+	c.JSON(http.StatusNoContent, nil)
 }
 
 // GetPetsByOwner godoc
